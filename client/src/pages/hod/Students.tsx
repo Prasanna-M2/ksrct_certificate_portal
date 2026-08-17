@@ -21,8 +21,8 @@ export const HodStudents: React.FC = () => {
       const res = await api.get('/users', {
         params: { search, year },
       });
-      if (res.data.success) {
-        setStudents(res.data.users);
+      if (res.data && res.data.success) {
+        setStudents(res.data.users || []);
       }
     } catch (err) {
       console.error('Failed to fetch students:', err);
@@ -42,8 +42,8 @@ export const HodStudents: React.FC = () => {
       const res = await api.get('/certificates', {
         params: { studentId: student.id },
       });
-      if (res.data.success) {
-        setStudentCerts(res.data.certificates);
+      if (res.data && res.data.success) {
+        setStudentCerts(res.data.certificates || []);
       }
     } catch (err) {
       console.error('Failed to fetch student certificates:', err);

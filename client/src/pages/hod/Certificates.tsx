@@ -34,8 +34,8 @@ export const HodCertificates: React.FC = () => {
       const res = await api.get('/certificates', {
         params: { search, category, status },
       });
-      if (res.data.success) {
-        setCertificates(res.data.certificates);
+      if (res.data && res.data.success) {
+        setCertificates(res.data.certificates || []);
       }
     } catch (err) {
       console.error('Failed to fetch certificates:', err);

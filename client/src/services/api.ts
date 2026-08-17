@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { User, Certificate, NotificationItem } from '../types';
+import { User, Certificate, NotificationItem, SupportTicket } from '../types';
 
 // Demo Initial Accounts
 const DEMO_USERS: Record<string, User> = {
@@ -249,27 +249,30 @@ export const api = {
 
     // 6. Notifications
     if (url.includes('/notifications')) {
+      const notifs: NotificationItem[] = [
+        {
+          id: 'n1',
+          userId: 'student-1',
+          title: 'Certificate Approved',
+          message: 'Your NPTEL - Internet of Things certificate was verified and approved by EEE HOD.',
+          type: 'SUCCESS',
+          isRead: false,
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: 'n2',
+          userId: 'student-1',
+          title: 'Action Required',
+          message: 'AICTE IDE Bootcamp certificate was rejected due to blurry seal.',
+          type: 'WARNING',
+          isRead: false,
+          createdAt: new Date().toISOString(),
+        },
+      ];
       return {
         data: {
           success: true,
-          notifications: [
-            {
-              id: 'n1',
-              title: 'Certificate Approved',
-              message: 'Your NPTEL - Internet of Things certificate was verified and approved by EEE HOD.',
-              type: 'SUCCESS',
-              isRead: false,
-              createdAt: new Date().toISOString(),
-            },
-            {
-              id: 'n2',
-              title: 'Action Required',
-              message: 'AICTE IDE Bootcamp certificate was rejected due to blurry seal.',
-              type: 'WARNING',
-              isRead: false,
-              createdAt: new Date().toISOString(),
-            },
-          ],
+          notifications: notifs,
           unreadCount: 2,
         },
       };
@@ -277,19 +280,21 @@ export const api = {
 
     // 7. Support Tickets
     if (url.includes('/support')) {
+      const tickets: SupportTicket[] = [
+        {
+          id: 't1',
+          userId: 'student-1',
+          subject: 'Register Number Correction',
+          message: 'My register number is showing 22EE123, please verify section mapping.',
+          status: 'OPEN',
+          createdAt: new Date().toISOString(),
+          user: DEMO_USERS['prasanna@student.ksrct.ac.in'],
+        },
+      ];
       return {
         data: {
           success: true,
-          tickets: [
-            {
-              id: 't1',
-              subject: 'Register Number Correction',
-              message: 'My register number is showing 22EE123, please verify section mapping.',
-              status: 'OPEN',
-              createdAt: new Date().toISOString(),
-              user: DEMO_USERS['prasanna@student.ksrct.ac.in'],
-            },
-          ],
+          tickets,
         },
       };
     }

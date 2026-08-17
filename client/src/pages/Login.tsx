@@ -37,7 +37,7 @@ export const Login: React.FC = () => {
       setLoading(true);
       const res = await api.post('/auth/login', { email, password });
 
-      if (res.data.success) {
+      if (res.data && res.data.success && res.data.user && res.data.token) {
         login(res.data.token, res.data.user);
         showToast(`Welcome back, ${res.data.user.name}!`, 'success');
         navigate('/dashboard', { replace: true });

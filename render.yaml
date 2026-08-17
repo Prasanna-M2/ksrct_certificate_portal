@@ -1,12 +1,12 @@
 services:
-  # Single Unified Web Service (Express API + React Frontend)
+  # Unified Web Service (Express API + React Frontend)
   - type: web
     name: ksrct-certificate-portal
     env: node
     region: singapore
     plan: free
-    buildCommand: cd server && npm install && npx prisma db push && npx ts-node prisma/seed.ts && npm run build
-    startCommand: cd server && npm start
+    buildCommand: npm run build
+    startCommand: npm start
     envVars:
       - key: PORT
         value: 5000

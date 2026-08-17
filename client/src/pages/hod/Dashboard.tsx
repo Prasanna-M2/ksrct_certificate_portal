@@ -53,10 +53,10 @@ export const HodDashboard: React.FC = () => {
     try {
       setLoading(true);
       const res = await api.get('/dashboard/hod');
-      if (res.data.success) {
-        setStats(res.data.stats);
-        setCharts(res.data.charts);
-        setRecentActivities(res.data.recentActivities);
+      if (res.data && res.data.success) {
+        setStats(res.data.stats as any || { totalStudents: 0, totalCertificates: 0, pending: 0, approved: 0, rejected: 0 });
+        setCharts(res.data.charts || { statusOverview: [], monthlyUploads: [], categoryDistribution: [] });
+        setRecentActivities(res.data.recentActivities || []);
       }
     } catch (err) {
       console.error('Failed to fetch HOD dashboard data:', err);

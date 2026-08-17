@@ -38,8 +38,8 @@ export const Support: React.FC = () => {
   const fetchTickets = async () => {
     try {
       const res = await api.get('/support');
-      if (res.data.success) {
-        setTickets(res.data.tickets);
+      if (res.data && res.data.success) {
+        setTickets(res.data.tickets || []);
       }
     } catch (err) {
       console.error('Failed to fetch tickets:', err);

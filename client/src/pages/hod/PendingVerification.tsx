@@ -20,8 +20,8 @@ export const PendingVerification: React.FC = () => {
       const res = await api.get('/certificates', {
         params: { status: 'PENDING', search },
       });
-      if (res.data.success) {
-        setCertificates(res.data.certificates);
+      if (res.data && res.data.success) {
+        setCertificates(res.data.certificates || []);
       }
     } catch (err) {
       console.error('Failed to fetch pending certificates:', err);

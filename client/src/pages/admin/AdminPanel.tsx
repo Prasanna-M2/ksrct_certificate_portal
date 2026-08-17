@@ -36,8 +36,8 @@ export const AdminPanel: React.FC = () => {
       const res = await api.get('/users', {
         params: { search: userSearch, role: roleFilter },
       });
-      if (res.data.success) {
-        setUsers(res.data.users);
+      if (res.data && res.data.success) {
+        setUsers(res.data.users || []);
       }
     } catch (err) {
       console.error('Failed to fetch users:', err);
@@ -52,8 +52,8 @@ export const AdminPanel: React.FC = () => {
       const res = await api.get('/audit-logs', {
         params: { search: auditSearch },
       });
-      if (res.data.success) {
-        setAuditLogs(res.data.logs);
+      if (res.data && res.data.success) {
+        setAuditLogs(res.data.logs || []);
       }
     } catch (err) {
       console.error('Failed to fetch audit logs:', err);
@@ -66,8 +66,8 @@ export const AdminPanel: React.FC = () => {
     try {
       setLoading(true);
       const res = await api.get('/support');
-      if (res.data.success) {
-        setSupportTickets(res.data.tickets);
+      if (res.data && res.data.success) {
+        setSupportTickets(res.data.tickets || []);
       }
     } catch (err) {
       console.error('Failed to fetch support tickets:', err);

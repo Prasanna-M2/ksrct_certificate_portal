@@ -32,9 +32,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (!user) return;
     try {
       const res = await api.get('/notifications');
-      if (res.data.success) {
-        setNotifications(res.data.notifications);
-        setUnreadCount(res.data.unreadCount);
+      if (res.data && res.data.success) {
+        setNotifications(res.data.notifications || []);
+        setUnreadCount(res.data.unreadCount || 0);
       }
     } catch (err) {
       console.error('Failed to fetch notifications:', err);

@@ -32,8 +32,8 @@ export const HodReports: React.FC = () => {
       const res = await api.get('/certificates', {
         params: { category, status, search, limit: 100 },
       });
-      if (res.data.success) {
-        setCertificates(res.data.certificates);
+      if (res.data && res.data.success) {
+        setCertificates(res.data.certificates || []);
       }
     } catch (err) {
       console.error('Failed to fetch report data:', err);

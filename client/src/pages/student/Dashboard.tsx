@@ -18,9 +18,9 @@ export const StudentDashboard: React.FC = () => {
     try {
       setLoading(true);
       const res = await api.get('/dashboard/student');
-      if (res.data.success) {
-        setStats(res.data.stats);
-        setRecentUploads(res.data.recentUploads);
+      if (res.data && res.data.success) {
+        setStats(res.data.stats as any || { total: 0, approved: 0, pending: 0, rejected: 0 });
+        setRecentUploads(res.data.recentUploads || []);
       }
     } catch (err) {
       console.error('Failed to fetch student dashboard data:', err);
