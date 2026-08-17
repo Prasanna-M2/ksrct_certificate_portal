@@ -1,28 +1,9 @@
 import axios from 'axios';
-import { User, Certificate, NotificationItem, AuditLogItem, SupportTicket } from '../types';
+import { User, Certificate, NotificationItem } from '../types';
 
-const baseURL = import.meta.env.VITE_API_URL || '/api';
-
-const api = axios.create({
-  baseURL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  timeout: 5000,
-});
-
-// Attach JWT token
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('ksrct_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-// Demo In-Browser Storage Helper for Standalone Static Hosting
-const DEMO_USERS: User[] = [
-  {
+// Demo Initial Accounts
+const DEMO_USERS: Record<string, User> = {
+  'prasanna@student.ksrct.ac.in': {
     id: 'student-1',
     name: 'Prasanna M',
     email: 'prasanna@student.ksrct.ac.in',
@@ -33,7 +14,7 @@ const DEMO_USERS: User[] = [
     phone: '+91 98765 43210',
     isActive: true,
   },
-  {
+  'hod.eee@ksrct.ac.in': {
     id: 'hod-1',
     name: 'EEE HOD',
     email: 'hod.eee@ksrct.ac.in',
@@ -42,7 +23,7 @@ const DEMO_USERS: User[] = [
     phone: '+91 94433 11223',
     isActive: true,
   },
-  {
+  'admin@ksrct.ac.in': {
     id: 'admin-1',
     name: 'System Administrator',
     email: 'admin@ksrct.ac.in',
@@ -51,9 +32,9 @@ const DEMO_USERS: User[] = [
     phone: '+91 94433 00000',
     isActive: true,
   },
-];
+};
 
-const INITIAL_CERTS: Certificate[] = [
+const DEFAULT_CERTS: Certificate[] = [
   {
     id: 'cert-1',
     studentId: 'student-1',
@@ -67,8 +48,8 @@ const INITIAL_CERTS: Certificate[] = [
     },
     title: 'NPTEL - Internet of Things',
     category: 'NPTEL',
-    description: '12-week NPTEL Online Certification completed with Elite status.',
-    fileName: 'nptel_iot_cert.pdf',
+    description: '12-week NPTEL Online Certification Course completed with Elite status.',
+    fileName: 'ksrct-campus.jpg',
     filePath: '/assets/ksrct-campus.jpg',
     fileType: 'image/jpeg',
     fileSize: 450000,
@@ -90,7 +71,7 @@ const INITIAL_CERTS: Certificate[] = [
     title: 'Summer Internship - SCG Exd Tech Pvt. Ltd.',
     category: 'Internship',
     description: 'Completed 4-week industrial training in embedded automation.',
-    fileName: 'internship_cert.pdf',
+    fileName: 'ksrct-campus.jpg',
     filePath: '/assets/ksrct-campus.jpg',
     fileType: 'image/jpeg',
     fileSize: 720000,
@@ -112,7 +93,7 @@ const INITIAL_CERTS: Certificate[] = [
     title: 'Workshop on PLC & SCADA',
     category: 'Workshop',
     description: 'Hands-on technical workshop organized by IEEE Student Branch.',
-    fileName: 'plc_workshop.pdf',
+    fileName: 'ksrct-campus.jpg',
     filePath: '/assets/ksrct-campus.jpg',
     fileType: 'image/jpeg',
     fileSize: 310000,
@@ -134,7 +115,7 @@ const INITIAL_CERTS: Certificate[] = [
     title: 'AICTE IDE Bootcamp',
     category: 'Hackathon',
     description: 'National Level Innovation Bootcamp runner-up.',
-    fileName: 'aicte_bootcamp.pdf',
+    fileName: 'ksrct-campus.jpg',
     filePath: '/assets/ksrct-campus.jpg',
     fileType: 'image/jpeg',
     fileSize: 512000,
@@ -145,57 +126,32 @@ const INITIAL_CERTS: Certificate[] = [
   },
 ];
 
-function getStoredCerts(): Certificate[] {
-  const saved = localStorage.getItem('demo_certs');
+function getCerts(): Certificate[] {
+  const saved = localStorage.getItem('ksrct_certs');
   if (saved) return JSON.parse(saved);
-  localStorage.setItem('demo_certs', JSON.stringify(INITIAL_CERTS));
-  return INITIAL_CERTS;
+  localStorage.setItem('ksrct_certs', JSON.stringify(DEFAULT_CERTS));
+  return DEFAULT_CERTS;
 }
 
-function saveStoredCerts(certs: Certificate[]) {
-  localStorage.setItem('demo_certs', JSON.stringify(certs));
+function setCerts(certs: Certificate[]) {
+  localStorage.setItem('ksrct_certs', JSON.stringify(certs));
 }
 
-// Smart Interceptor Fallback for Standalone Public Demo
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    // If real backend call fails (network error / 404 on static host), handle gracefully in Demo Mode!
-    const config = error.config;
-    if (!config) return Promise.reject(error);
-
-    const url = config.url || '';
-    const method = (config.method || 'get').toLowerCase();
-
-    // 1. Auth Login Fallback
-    if (url.includes('/auth/login') && method === 'post') {
-      const body = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
-      const email = body?.email?.toLowerCase();
-      const user = DEMO_USERS.find((u) => u.email.toLowerCase() === email) || DEMO_USERS[0];
-
-      return Promise.resolve({
-        data: {
-          success: true,
-          token: `demo-token-${user.id}`,
-          user,
-        },
-      });
-    }
-
-    // 2. Auth Me Fallback
-    if (url.includes('/auth/me') && method === 'get') {
+// Bulletproof API Client
+export const api = {
+  get: async (url: string, config?: any) => {
+    // 1. Auth Me
+    if (url.includes('/auth/me')) {
       const savedUser = localStorage.getItem('ksrct_user');
-      const user = savedUser ? JSON.parse(savedUser) : DEMO_USERS[0];
-      return Promise.resolve({ data: { success: true, user } });
+      const user = savedUser ? JSON.parse(savedUser) : DEMO_USERS['prasanna@student.ksrct.ac.in'];
+      return { data: { success: true, user } };
     }
 
-    // 3. Student Dashboard Stats Fallback
+    // 2. Student Dashboard
     if (url.includes('/dashboard/student')) {
-      const certs = getStoredCerts();
-      const studentId = 'student-1';
-      const myCerts = certs.filter((c) => c.studentId === studentId);
-
-      return Promise.resolve({
+      const certs = getCerts();
+      const myCerts = certs.filter((c) => c.studentId === 'student-1');
+      return {
         data: {
           success: true,
           stats: {
@@ -206,17 +162,17 @@ api.interceptors.response.use(
           },
           recentUploads: myCerts.slice(0, 5),
         },
-      });
+      };
     }
 
-    // 4. HOD Dashboard Stats Fallback
+    // 3. HOD Dashboard
     if (url.includes('/dashboard/hod')) {
-      const certs = getStoredCerts();
+      const certs = getCerts();
       const approved = certs.filter((c) => c.status === 'APPROVED').length;
       const pending = certs.filter((c) => c.status === 'PENDING').length;
       const rejected = certs.filter((c) => c.status === 'REJECTED').length;
 
-      return Promise.resolve({
+      return {
         data: {
           success: true,
           stats: {
@@ -249,13 +205,13 @@ api.interceptors.response.use(
             { id: '2', description: 'EEE HOD approved NPTEL Certificate', userName: 'EEE HOD', createdAt: new Date().toISOString() },
           ],
         },
-      });
+      };
     }
 
-    // 5. Certificates List & Search Fallback
-    if (url.includes('/certificates') && method === 'get' && !url.includes('/file')) {
-      let certs = getStoredCerts();
-      const params = config.params || {};
+    // 4. Certificates List
+    if (url.includes('/certificates') && !url.includes('/file')) {
+      let certs = getCerts();
+      const params = config?.params || {};
 
       if (params.status && params.status !== 'ALL') {
         certs = certs.filter((c) => c.status === params.status);
@@ -273,25 +229,142 @@ api.interceptors.response.use(
         );
       }
 
-      return Promise.resolve({
+      return {
         data: {
           success: true,
           certificates: certs,
         },
-      });
+      };
     }
 
-    // 6. Upload Certificate Fallback
-    if (url.includes('/certificates') && method === 'post' && !url.includes('/approve') && !url.includes('/reject')) {
-      const certs = getStoredCerts();
-      let title = 'New Certificate';
+    // 5. Users List
+    if (url.includes('/users')) {
+      return {
+        data: {
+          success: true,
+          users: Object.values(DEMO_USERS),
+        },
+      };
+    }
+
+    // 6. Notifications
+    if (url.includes('/notifications')) {
+      return {
+        data: {
+          success: true,
+          notifications: [
+            {
+              id: 'n1',
+              title: 'Certificate Approved',
+              message: 'Your NPTEL - Internet of Things certificate was verified and approved by EEE HOD.',
+              type: 'SUCCESS',
+              isRead: false,
+              createdAt: new Date().toISOString(),
+            },
+            {
+              id: 'n2',
+              title: 'Action Required',
+              message: 'AICTE IDE Bootcamp certificate was rejected due to blurry seal.',
+              type: 'WARNING',
+              isRead: false,
+              createdAt: new Date().toISOString(),
+            },
+          ],
+          unreadCount: 2,
+        },
+      };
+    }
+
+    // 7. Support Tickets
+    if (url.includes('/support')) {
+      return {
+        data: {
+          success: true,
+          tickets: [
+            {
+              id: 't1',
+              subject: 'Register Number Correction',
+              message: 'My register number is showing 22EE123, please verify section mapping.',
+              status: 'OPEN',
+              createdAt: new Date().toISOString(),
+              user: DEMO_USERS['prasanna@student.ksrct.ac.in'],
+            },
+          ],
+        },
+      };
+    }
+
+    // 8. Audit Logs
+    if (url.includes('/audit-logs')) {
+      return {
+        data: {
+          success: true,
+          logs: [
+            {
+              id: 'al-1',
+              userName: 'Prasanna M',
+              action: 'CERTIFICATE_UPLOAD',
+              description: 'Uploaded certificate "Summer Internship - SCG Exd Tech Pvt. Ltd."',
+              ipAddress: '127.0.0.1',
+              createdAt: new Date().toISOString(),
+            },
+            {
+              id: 'al-2',
+              userName: 'EEE HOD',
+              action: 'CERTIFICATE_APPROVED',
+              description: 'Approved certificate "NPTEL - Internet of Things" for Prasanna M',
+              ipAddress: '127.0.0.1',
+              createdAt: new Date().toISOString(),
+            },
+          ],
+        },
+      };
+    }
+
+    return { data: { success: true } };
+  },
+
+  post: async (url: string, data?: any, config?: any) => {
+    // 1. Auth Login
+    if (url.includes('/auth/login')) {
+      const email = (data?.email || '').toLowerCase().trim();
+      const user = DEMO_USERS[email] || {
+        id: `user-${Date.now()}`,
+        name: email.split('@')[0].toUpperCase(),
+        email: email || 'student@ksrct.ac.in',
+        role: email.includes('hod') ? 'HOD' : email.includes('admin') ? 'ADMIN' : 'STUDENT',
+        department: 'Electrical and Electronics Engineering',
+        year: 'III',
+        registerNumber: '22EE123',
+        phone: '+91 98765 43210',
+        isActive: true,
+      };
+
+      return {
+        data: {
+          success: true,
+          message: 'Login successful',
+          token: `token-${user.id}`,
+          user,
+        },
+      };
+    }
+
+    // 2. Upload Certificate
+    if (url.includes('/certificates') && !url.includes('/approve') && !url.includes('/reject')) {
+      const certs = getCerts();
+      let title = 'Uploaded Certificate';
       let category: any = 'NPTEL';
       let issuedDate = new Date().toISOString().split('T')[0];
 
-      if (config.data instanceof FormData) {
-        title = (config.data.get('title') as string) || title;
-        category = (config.data.get('category') as any) || category;
-        issuedDate = (config.data.get('issuedDate') as string) || issuedDate;
+      if (data instanceof FormData) {
+        title = (data.get('title') as string) || title;
+        category = (data.get('category') as any) || category;
+        issuedDate = (data.get('issuedDate') as string) || issuedDate;
+      } else if (data) {
+        title = data.title || title;
+        category = data.category || category;
+        issuedDate = data.issuedDate || issuedDate;
       }
 
       const newCert: Certificate = {
@@ -308,111 +381,83 @@ api.interceptors.response.use(
         title,
         category,
         issuedDate,
-        fileName: 'certificate_upload.pdf',
+        fileName: 'ksrct-campus.jpg',
         filePath: '/assets/ksrct-campus.jpg',
         fileType: 'image/jpeg',
-        fileSize: 500000,
+        fileSize: 520000,
         status: 'PENDING',
         uploadedAt: new Date().toISOString(),
       };
 
       certs.unshift(newCert);
-      saveStoredCerts(certs);
+      setCerts(certs);
 
-      return Promise.resolve({
+      return {
         data: {
           success: true,
-          message: 'Certificate uploaded successfully in Demo Mode.',
+          message: 'Certificate uploaded successfully.',
           certificate: newCert,
         },
-      });
+      };
     }
 
-    // 7. Approve Certificate Fallback
-    if (url.includes('/approve') && method === 'post') {
-      const id = url.split('/')[2];
-      const certs = getStoredCerts();
+    // 3. Approve Certificate
+    if (url.includes('/approve')) {
+      const parts = url.split('/');
+      const id = parts[parts.indexOf('approve') - 1] || parts[2];
+      const certs = getCerts();
       const idx = certs.findIndex((c) => c.id === id);
       if (idx !== -1) {
         certs[idx].status = 'APPROVED';
         certs[idx].verifiedAt = new Date().toISOString();
-        saveStoredCerts(certs);
+        setCerts(certs);
       }
-
-      return Promise.resolve({
-        data: {
-          success: true,
-          message: 'Certificate approved successfully.',
-        },
-      });
+      return { data: { success: true, message: 'Certificate approved successfully.' } };
     }
 
-    // 8. Reject Certificate Fallback
-    if (url.includes('/reject') && method === 'post') {
-      const id = url.split('/')[2];
-      const body = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
-      const certs = getStoredCerts();
+    // 4. Reject Certificate
+    if (url.includes('/reject')) {
+      const parts = url.split('/');
+      const id = parts[parts.indexOf('reject') - 1] || parts[2];
+      const certs = getCerts();
       const idx = certs.findIndex((c) => c.id === id);
       if (idx !== -1) {
         certs[idx].status = 'REJECTED';
-        certs[idx].rejectionReason = body?.rejectionReason || 'Rejected by verifier.';
-        saveStoredCerts(certs);
+        certs[idx].rejectionReason = data?.rejectionReason || 'Rejected by verifier.';
+        setCerts(certs);
       }
-
-      return Promise.resolve({
-        data: {
-          success: true,
-          message: 'Certificate rejected with remarks.',
-        },
-      });
+      return { data: { success: true, message: 'Certificate rejected with remarks.' } };
     }
 
-    // 9. Users Fallback
-    if (url.includes('/users') && method === 'get') {
-      return Promise.resolve({
-        data: {
-          success: true,
-          users: DEMO_USERS,
-        },
-      });
+    // 5. Support Ticket Submission
+    if (url.includes('/support')) {
+      return { data: { success: true, message: 'Support ticket submitted.' } };
     }
 
-    // 10. Notifications Fallback
-    if (url.includes('/notifications')) {
-      return Promise.resolve({
-        data: {
-          success: true,
-          notifications: [
-            {
-              id: 'n1',
-              title: 'Certificate Approved',
-              message: 'Your NPTEL - Internet of Things certificate was approved by EEE HOD.',
-              type: 'SUCCESS',
-              isRead: false,
-              createdAt: new Date().toISOString(),
-            },
-            {
-              id: 'n2',
-              title: 'Rejection Remarks',
-              message: 'AICTE IDE Bootcamp certificate was rejected due to blurry seal.',
-              type: 'WARNING',
-              isRead: false,
-              createdAt: new Date().toISOString(),
-            },
-          ],
-          unreadCount: 2,
-        },
-      });
-    }
+    return { data: { success: true } };
+  },
 
-    // Default fallback
-    return Promise.resolve({
-      data: {
-        success: true,
-        message: 'Action completed in standalone demo mode.',
-      },
-    });
-  }
-);
+  patch: async (url: string, data?: any) => {
+    if (url.includes('/users/profile')) {
+      const saved = localStorage.getItem('ksrct_user');
+      const current = saved ? JSON.parse(saved) : DEMO_USERS['prasanna@student.ksrct.ac.in'];
+      const updated = { ...current, ...data };
+      localStorage.setItem('ksrct_user', JSON.stringify(updated));
+      return { data: { success: true, user: updated } };
+    }
+    return { data: { success: true } };
+  },
+
+  delete: async (url: string) => {
+    if (url.includes('/certificates')) {
+      const parts = url.split('/');
+      const id = parts[parts.length - 1];
+      const certs = getCerts().filter((c) => c.id !== id);
+      setCerts(certs);
+      return { data: { success: true, message: 'Certificate deleted.' } };
+    }
+    return { data: { success: true } };
+  },
+};
 
 export default api;
