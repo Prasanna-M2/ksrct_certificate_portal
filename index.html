@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KSRCT Certificate Management Portal</title>
+  <meta name="description" content="Student Certificate Management Portal for K.S.Rangasamy College of Technology" />
+  <link rel="icon" href="assets/ksrct-logo.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="toastRoot" class="toast-root"></div>
+
+  <section id="loginView" class="login-shell">
+    <div class="login-brand-panel">
+      <div class="brand-overlay"></div>
+      <div class="brand-content">
+        <img src="assets/ksrct-logo.png" class="login-logo" alt="KSRCT logo" />
+        <p class="eyebrow">K.S.RANGASAMY COLLEGE OF TECHNOLOGY</p>
+        <h1>Student Certificate<br><span>Management Portal</span></h1>
+        <p class="brand-copy">Upload, verify and manage student certificates with ease.</p>
+        <div class="brand-pills"><span>Secure</span><span>Fast</span><span>Paperless</span></div>
+      </div>
+      <div class="brand-footer">© 2026 K.S.Rangasamy College of Technology</div>
+    </div>
+
+    <div class="login-panel">
+      <div class="login-card">
+        <div class="mobile-logo-row"><img src="assets/ksrct-logo.png" alt="KSRCT" /></div>
+        <div class="login-heading">
+          <h2>Welcome Back!</h2>
+          <p>Please login to your account</p>
+        </div>
+        <form id="loginForm">
+          <label>Role</label>
+          <select id="loginRole">
+            <option value="student">Student</option>
+            <option value="hod">HOD / Verifier</option>
+          </select>
+          <label>Email</label>
+          <input id="loginEmail" type="email" placeholder="Enter your email" required />
+          <label>Password</label>
+          <div class="password-wrap"><input id="loginPassword" type="password" placeholder="Enter your password" required /><button type="button" id="togglePassword">◉</button></div>
+          <button class="primary-btn full" type="submit">Login</button>
+        </form>
+        <div class="demo-box">
+          <strong>Demo access</strong>
+          <span>Student: prasanna@gmail.com / student123</span>
+          <span>HOD: hod@ksrct.ac.in / hod123</span>
+        </div>
+        <p class="contact-admin">Don't have an account? <button id="contactAdminBtn">Contact Admin</button></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="appView" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <img src="assets/ksrct-logo.png" alt="KSRCT logo" />
+        <div><strong>K.S.RANGASAMY</strong><span>COLLEGE OF TECHNOLOGY</span></div>
+      </div>
+      <div id="sidebarNav" class="sidebar-nav"></div>
+      <div class="sidebar-bottom">
+        <button class="nav-item" data-page="support"><span>◌</span> Help & Support</button>
+        <button class="nav-item" id="logoutBtn"><span>↪</span> Logout</button>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="mobile-menu"><button id="mobileMenuBtn">☰</button></div>
+        <div class="topbar-title"><span id="pageCrumb">Dashboard</span></div>
+        <div class="top-actions">
+          <button id="notificationBtn" class="icon-btn" title="Notifications">♧<b id="notificationBadge">3</b></button>
+          <div class="user-menu" id="userMenuBtn">
+            <div class="avatar" id="headerAvatar">PM</div>
+            <div class="user-meta"><strong id="headerName">Prasanna M</strong><span id="headerRole">Student</span></div>
+            <span>⌄</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="content-wrap">
+        <div id="pageContent"></div>
+      </div>
+    </main>
+  </section>
+
+  <div id="modalRoot"></div>
+  <input id="globalFileInput" type="file" accept=".pdf,.jpg,.jpeg,.png" hidden />
+  <script src="app.js"></script>
+</body>
+</html>

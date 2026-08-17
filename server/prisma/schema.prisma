@@ -1,0 +1,105 @@
+// Prisma Schema for KSRCT Certificate Portal
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String        @id @default(uuid())
+  name           String
+  email          String        @unique
+  passwordHash   String
+  role           String        @default("STUDENT") // STUDENT, HOD, ADMIN
+  department     String        // e.g., "Electrical and Electronics Engineering"
+  year           String?       // I, II, III, IV (for students)
+  registerNumber String?       @unique
+  phone          String?
+  profileImage   String?
+  isActive       Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  certificates   Certificate[]  @relation("StudentCertificates")
+  verifiedCerts  Certificate[]  @relation("VerifiedCertificates")
+  notifications  Notification[]
+  auditLogs      AuditLog[]
+  supportTickets SupportTicket[]
+}
+
+model Certificate {
+  id              String   @id @default(uuid())
+  studentId       String
+  student         User     @relation("StudentCertificates", fields: [studentId], references: [id], onDelete: Cascade)
+  title           String
+  category        String   // NPTEL, Internship, Workshop, Hackathon, NSS, NCC, Sports, Technical, Academic, Certification, Other
+  description     String?
+  fileName        String
+  filePath        String
+  fileType        String
+  fileSize        Int
+  status          String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  issuedDate      String   // ISO string date or YYYY-MM-DD
+  uploadedAt      DateTime @default(now())
+  verifiedAt      DateTime?
+  verifiedById    String?
+  verifiedBy      User?    @relation("VerifiedCertificates", fields: [verifiedById], references: [id])
+  rejectionReason String?
+
+  @@index([studentId])
+  @@index([status])
+  @@index([category])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String   @default("INFO") // INFO, SUCCESS, WARNING, ERROR
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  userName    String?
+  action      String   // LOGIN, CERTIFICATE_UPLOAD, CERTIFICATE_APPROVED, CERTIFICATE_REJECTED, etc.
+  entityType  String?
+  entityId    String?
+  description String
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  @@index([userId])
+}
+
+model Department {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  code      String   @unique
+  hodId     String?
+  createdAt DateTime @default(now())
+}
+
+model SupportTicket {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject   String
+  message   String
+  status    String   @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
