@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
@@ -13,9 +13,16 @@ export const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const { login } = useAuth();
+  const { user, token, login } = useAuth();
   const { showToast } = useNotification();
   const navigate = useNavigate();
+
+  // If user is already authenticated, redirect immediately to dashboard
+  useEffect(() => {
+    if (token && user) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [token, user, navigate]);
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +40,7 @@ export const Login: React.FC = () => {
       if (res.data.success) {
         login(res.data.token, res.data.user);
         showToast(`Welcome back, ${res.data.user.name}!`, 'success');
-        navigate('/dashboard');
+        navigate('/dashboard', { replace: true });
       }
     } catch (err: any) {
       const msg = err.response?.data?.message || 'Login failed. Please verify your credentials.';

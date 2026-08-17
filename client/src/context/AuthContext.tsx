@@ -26,13 +26,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (token) {
         try {
           const res = await api.get('/auth/me');
-          if (res.data.success) {
+          if (res.data?.success && res.data?.user) {
             setUser(res.data.user);
             localStorage.setItem('ksrct_user', JSON.stringify(res.data.user));
           }
         } catch (err) {
-          console.error('Session check failed:', err);
-          logout();
+          console.log('Backend auth sync info:', err);
+          // Do not logout if local user session exists
+          const savedUser = localStorage.getItem('ksrct_user');
+          if (savedUser) {
+            setUser(JSON.parse(savedUser));
+          }
         }
       }
       setLoading(false);
@@ -49,11 +53,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
-    try {
-      api.post('/auth/logout');
-    } catch (e) {
-      // Ignore error on logout
-    }
     setToken(null);
     setUser(null);
     localStorage.removeItem('ksrct_token');
