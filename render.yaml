@@ -1,11 +1,11 @@
 services:
-  # 1. Backend Web Service (Node.js Express API)
+  # 1. Backend API Service
   - type: web
     name: ksrct-portal-backend
     env: node
     region: singapore
     plan: free
-    buildCommand: cd server && npm install && npx prisma db push && npm run build
+    buildCommand: cd server && npm install && npx prisma db push && npx ts-node prisma/seed.ts && npm run build
     startCommand: cd server && npm start
     envVars:
       - key: PORT
@@ -16,17 +16,13 @@ services:
         generateValue: true
       - key: CLIENT_URL
         sync: false
-    disk:
-      name: ksrct-uploads
-      mountPath: /opt/render/project/src/uploads
-      sizeGB: 1
 
-  # 2. Frontend Static Site (React Vite SPA)
+  # 2. Frontend Static Site
   - type: web
     name: ksrct-portal-frontend
     env: static
     buildCommand: cd client && npm install && npm run build
-    staticPublishPath: ./client/dist
+    staticPublishPath: client/dist
     routes:
       - type: rewrite
         source: /*
