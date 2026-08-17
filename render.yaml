@@ -1,5 +1,5 @@
 services:
-  # 1. Backend API Service
+  # 1. Backend API Web Service
   - type: web
     name: ksrct-portal-backend
     env: node
@@ -17,12 +17,12 @@ services:
       - key: CLIENT_URL
         sync: false
 
-  # 2. Frontend Static Site
+  # 2. Frontend React Static Site
   - type: web
     name: ksrct-portal-frontend
     env: static
     buildCommand: cd client && npm install && npm run build
-    staticPublishPath: client/dist
+    staticPublishPath: ./client/dist
     routes:
       - type: rewrite
         source: /*
