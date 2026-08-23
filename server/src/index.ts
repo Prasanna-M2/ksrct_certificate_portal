@@ -72,33 +72,34 @@ const clientDistDir = path.resolve(__dirname, '../../client/dist');
 if (fs.existsSync(clientDistDir)) {
   app.use(express.static(clientDistDir));
   app.get('*', (req, res) => {
+    if (req.path.startsWith('/api')) {
+      return res.status(404).json({ success: false, message: 'API endpoint not found.' });
+    }
     res.sendFile(path.join(clientDistDir, 'index.html'));
   });
 }
 
-// Bootstrap check for Admin account
+// Bootstrap check for Creator & Admin accounts
 const ensureBootstrapAdmin = async () => {
   try {
-    const adminCount = await prisma.user.count({ where: { role: 'ADMIN' } });
-    if (adminCount === 0) {
-      const email = (process.env.BOOTSTRAP_ADMIN_EMAIL || 'admin@ksrct.ac.in').toLowerCase().trim();
-      const password = process.env.BOOTSTRAP_ADMIN_PASSWORD || 'Admin@ksrct2026';
-      const passwordHash = await bcrypt.hash(password, 10);
+    const userCount = await prisma.user.count();
+    if (userCount === 0) {
+      const creatorPasswordHash = await bcrypt.hash('Creator@123', 10);
       await prisma.user.create({
         data: {
-          name: 'System Administrator',
-          email,
-          passwordHash,
-          role: 'ADMIN',
-          department: 'Administration',
-          phone: '+91 94433 00000',
+          name: 'Master Creator',
+          email: 'creator@ksrct.ac.in',
+          passwordHash: creatorPasswordHash,
+          role: 'CREATOR',
+          department: 'Electrical and Electronics Engineering',
+          phone: '+91 98422 11111',
           isActive: true,
         },
       });
-      console.log(`🔑 Created initial Bootstrap Admin: ${email}`);
+      console.log('🔑 Auto-created Master Creator: creator@ksrct.ac.in');
     }
   } catch (err) {
-    console.error('Error checking bootstrap admin:', err);
+    console.error('Error during database bootstrap check:', err);
   }
 };
 
