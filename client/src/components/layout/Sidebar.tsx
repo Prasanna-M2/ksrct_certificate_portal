@@ -151,7 +151,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 `flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300 ${
                   isActive
                     ? 'bg-gradient-to-r from-[#f37021] to-[#e05e0e] text-white shadow-md font-extrabold translate-x-1 border border-white/30'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-[#0a4c95] hover:translate-x-0.5'
+                    : 'text-slate-800 font-extrabold hover:bg-slate-100 hover:text-[#0a4c95] hover:translate-x-0.5'
                 }`
               }
             >

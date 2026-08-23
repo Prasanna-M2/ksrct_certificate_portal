@@ -88,29 +88,29 @@ export const ApprovalTimeline: React.FC<ApprovalTimelineProps> = ({
     <div className="w-full py-4">
       <div className="relative flex flex-col md:flex-row justify-between items-start md:items-center space-y-6 md:space-y-0">
         {/* Connection Line behind nodes */}
-        <div className="hidden md:block absolute top-5 left-8 right-8 h-0.5 bg-white/10 -z-0" />
+        <div className="hidden md:block absolute top-5 left-8 right-8 h-0.5 bg-slate-300 -z-0" />
 
         {steps.map((step, idx) => {
-          let nodeBg = 'bg-[#061426] border-white/10 text-slate-500';
+          let nodeBg = 'bg-slate-100 border-slate-300 text-slate-500';
           let icon = <Clock className="w-4 h-4 text-slate-500" />;
           let badgeText = 'Waiting';
-          let badgeClass = 'bg-white/5 text-slate-400 border-white/10';
+          let badgeClass = 'bg-slate-100 text-slate-700 border-slate-300';
 
           if (step.isCompleted) {
-            nodeBg = 'bg-emerald-500 border-emerald-400 text-slate-950 shadow-[0_0_15px_rgba(16,185,129,0.35)]';
-            icon = <CheckCircle2 className="w-4 h-4 text-slate-950 font-black" />;
+            nodeBg = 'bg-emerald-600 border-emerald-500 text-white shadow-xs';
+            icon = <CheckCircle2 className="w-4 h-4 text-white font-black" />;
             badgeText = 'Completed';
-            badgeClass = 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+            badgeClass = 'bg-emerald-100 text-emerald-900 border-emerald-300';
           } else if (step.isRejected) {
-            nodeBg = 'bg-rose-500 border-rose-400 text-white shadow-xs';
+            nodeBg = 'bg-rose-600 border-rose-500 text-white shadow-xs';
             icon = <XCircle className="w-4 h-4 text-white" />;
             badgeText = 'Rejected';
-            badgeClass = 'bg-rose-500/15 text-rose-300 border-rose-500/30';
+            badgeClass = 'bg-rose-100 text-rose-900 border-rose-300';
           } else if (step.isCurrent) {
-            nodeBg = 'bg-[#f37021] border-[#ff934d] text-white shadow-[0_0_18px_rgba(243,112,33,0.45)] animate-pulse-subtle';
+            nodeBg = 'bg-[#f37021] border-[#d8580d] text-white shadow-md animate-pulse';
             icon = <AlertCircle className="w-4 h-4 text-white font-black" />;
             badgeText = 'In Review';
-            badgeClass = 'bg-[#f37021]/20 text-[#f37021] border-[#f37021]/40';
+            badgeClass = 'bg-orange-100 text-orange-950 border-orange-300 font-extrabold';
           }
 
           return (
@@ -119,21 +119,21 @@ export const ApprovalTimeline: React.FC<ApprovalTimelineProps> = ({
                 {icon}
               </div>
               <div className="flex-1">
-                <p className="text-xs font-black text-white">{step.title}</p>
-                <p className="text-[10px] text-slate-400 font-medium">{step.role}</p>
+                <p className="text-xs font-black text-slate-900">{step.title}</p>
+                <p className="text-[10px] text-slate-600 font-bold">{step.role}</p>
 
-                <span className={`inline-block mt-1 px-2.5 py-0.5 text-[10px] font-bold border rounded-full ${badgeClass}`}>
+                <span className={`inline-block mt-1 px-2.5 py-0.5 text-[10px] font-extrabold border rounded-full ${badgeClass}`}>
                   {badgeText}
                 </span>
 
                 {step.date && (
-                  <p className="text-[10px] text-slate-400 font-mono mt-1">
+                  <p className="text-[10px] text-slate-600 font-mono font-bold mt-1">
                     {new Date(step.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </p>
                 )}
 
                 {step.remarks && (
-                  <p className="text-[10px] italic text-[#f37021]/90 mt-1 max-w-[140px] truncate" title={step.remarks}>
+                  <p className="text-[10px] font-bold italic text-[#f37021] mt-1 max-w-[140px] truncate" title={step.remarks}>
                     "{step.remarks}"
                   </p>
                 )}
