@@ -308,30 +308,30 @@ export const Login: React.FC = () => {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-700">Email Address</label>
+                    <label className="block text-xs font-black text-slate-900 uppercase">Email Address</label>
                     <div className="relative">
-                      <Mail className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
+                      <Mail className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-500" />
                       <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder={loginType === 'STUDENT' ? 'student1@ksrct.ac.in' : loginType === 'STAFF' ? 'staff@ksrct.ac.in' : 'creator@ksrct.ac.in'}
-                        className="w-full pl-10 pr-3.5 py-3 text-xs font-medium rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:bg-white focus:border-[#f37021] focus:ring-2 focus:ring-[#f37021]/20 outline-none transition-all"
+                        className="w-full pl-10 pr-3.5 py-3 text-xs font-black rounded-xl bg-white border-2 border-slate-300 text-slate-900 focus:border-[#f37021] focus:ring-2 focus:ring-[#f37021]/20 outline-none transition-all placeholder:text-slate-500"
                         required
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-700">Password</label>
+                    <label className="block text-xs font-black text-slate-900 uppercase">Password</label>
                     <div className="relative">
-                      <Lock className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
+                      <Lock className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-500" />
                       <input
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
-                        className="w-full pl-10 pr-3.5 py-3 text-xs font-medium rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:bg-white focus:border-[#f37021] focus:ring-2 focus:ring-[#f37021]/20 outline-none transition-all"
+                        className="w-full pl-10 pr-3.5 py-3 text-xs font-black rounded-xl bg-white border-2 border-slate-300 text-slate-900 focus:border-[#f37021] focus:ring-2 focus:ring-[#f37021]/20 outline-none transition-all placeholder:text-slate-500"
                         required
                       />
                     </div>
