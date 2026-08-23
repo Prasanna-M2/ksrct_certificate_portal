@@ -206,20 +206,20 @@ export const StaffDashboard: React.FC = () => {
       </div>
 
       {/* Dynamic Module Segmented Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-white/10">
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200">
         {isMentor && (
           <button
             onClick={() => setActiveTab('MENTOR')}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300 cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-black transition-all duration-300 cursor-pointer ${
               activeTab === 'MENTOR'
-                ? 'bg-gradient-to-r from-[#f37021] to-[#d8580d] text-white shadow-[0_0_15px_rgba(243,112,33,0.4)] border border-white/20'
-                : 'glass-card text-slate-300 hover:text-white hover:border-[#0a4c95]/50'
+                ? 'bg-gradient-to-r from-[#f37021] to-[#d8580d] text-white shadow-md'
+                : 'bg-white text-slate-900 border border-slate-300 hover:bg-orange-50 hover:text-[#f37021]'
             }`}
           >
             <Users className="w-4 h-4" />
             <span>My Mentees Scope</span>
             {statsData?.mentorStats?.pendingApprovals > 0 && (
-              <span className="px-2 py-0.5 text-[10px] rounded-full bg-white text-[#f37021] font-black shadow-xs">
+              <span className="px-2 py-0.5 text-[10px] rounded-full bg-[#f37021] text-white font-black shadow-xs">
                 {statsData.mentorStats.pendingApprovals}
               </span>
             )}
@@ -229,16 +229,16 @@ export const StaffDashboard: React.FC = () => {
         {isAdvisor && (
           <button
             onClick={() => setActiveTab('ADVISOR')}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300 cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-black transition-all duration-300 cursor-pointer ${
               activeTab === 'ADVISOR'
-                ? 'bg-gradient-to-r from-[#f37021] to-[#d8580d] text-white shadow-[0_0_15px_rgba(243,112,33,0.4)] border border-white/20'
-                : 'glass-card text-slate-300 hover:text-white hover:border-[#0a4c95]/50'
+                ? 'bg-gradient-to-r from-[#f37021] to-[#d8580d] text-white shadow-md'
+                : 'bg-white text-slate-900 border border-slate-300 hover:bg-orange-50 hover:text-[#f37021]'
             }`}
           >
             <GraduationCap className="w-4 h-4" />
             <span>My Class Scope</span>
             {statsData?.advisorStats?.pendingApprovals > 0 && (
-              <span className="px-2 py-0.5 text-[10px] rounded-full bg-white text-[#f37021] font-black shadow-xs">
+              <span className="px-2 py-0.5 text-[10px] rounded-full bg-[#f37021] text-white font-black shadow-xs">
                 {statsData.advisorStats.pendingApprovals}
               </span>
             )}
@@ -248,16 +248,16 @@ export const StaffDashboard: React.FC = () => {
         {isHod && (
           <button
             onClick={() => setActiveTab('HOD')}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300 cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-black transition-all duration-300 cursor-pointer ${
               activeTab === 'HOD'
-                ? 'bg-gradient-to-r from-[#f37021] to-[#d8580d] text-white shadow-[0_0_15px_rgba(243,112,33,0.4)] border border-white/20'
-                : 'glass-card text-slate-300 hover:text-white hover:border-[#0a4c95]/50'
+                ? 'bg-gradient-to-r from-[#f37021] to-[#d8580d] text-white shadow-md'
+                : 'bg-white text-slate-900 border border-slate-300 hover:bg-orange-50 hover:text-[#f37021]'
             }`}
           >
             <Building className="w-4 h-4" />
             <span>EEE Department Scope</span>
             {statsData?.hodStats?.pendingApprovals > 0 && (
-              <span className="px-2 py-0.5 text-[10px] rounded-full bg-white text-[#f37021] font-black shadow-xs">
+              <span className="px-2 py-0.5 text-[10px] rounded-full bg-[#f37021] text-white font-black shadow-xs">
                 {statsData.hodStats.pendingApprovals}
               </span>
             )}
@@ -266,10 +266,10 @@ export const StaffDashboard: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('APPROVALS')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300 cursor-pointer ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-black transition-all duration-300 cursor-pointer ${
             activeTab === 'APPROVALS'
-              ? 'bg-gradient-to-r from-[#f37021] to-[#d8580d] text-white shadow-[0_0_15px_rgba(243,112,33,0.4)] border border-white/20'
-              : 'glass-card text-slate-300 hover:text-white hover:border-[#0a4c95]/50'
+              ? 'bg-gradient-to-r from-[#f37021] to-[#d8580d] text-white shadow-md'
+              : 'bg-white text-slate-900 border border-slate-300 hover:bg-orange-50 hover:text-[#f37021]'
           }`}
         >
           <Clock className="w-4 h-4" />
@@ -278,10 +278,10 @@ export const StaffDashboard: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('STUDENTS')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300 cursor-pointer ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-black transition-all duration-300 cursor-pointer ${
             activeTab === 'STUDENTS'
-              ? 'bg-gradient-to-r from-[#f37021] to-[#d8580d] text-white shadow-[0_0_15px_rgba(243,112,33,0.4)] border border-white/20'
-              : 'glass-card text-slate-300 hover:text-white hover:border-[#0a4c95]/50'
+              ? 'bg-gradient-to-r from-[#f37021] to-[#d8580d] text-white shadow-md'
+              : 'bg-white text-slate-900 border border-slate-300 hover:bg-orange-50 hover:text-[#f37021]'
           }`}
         >
           <Users className="w-4 h-4" />
