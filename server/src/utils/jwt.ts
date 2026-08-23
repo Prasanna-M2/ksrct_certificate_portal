@@ -1,12 +1,13 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'ksrct_secret_jwt_token_key_2026_super_secure';
+export const JWT_SECRET = process.env.JWT_SECRET || 'ksrct_secret_jwt_token_key_2026_super_secure';
 
 export interface TokenPayload {
   userId: string;
   email: string;
   role: string;
   department: string;
+  responsibilities?: string[];
 }
 
 export const generateToken = (payload: TokenPayload): string => {

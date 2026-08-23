@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import api from '../../services/api';
-import { Certificate, CertificateCategory, CertificateStatus } from '../../types';
+import { Certificate } from '../../types';
 import { StatusBadge } from '../../components/common/StatusBadge';
-import { CertificateViewerModal } from '../../components/common/CertificateViewerModal';
-import { useNotification } from '../../context/NotificationContext';
-import { Search, Filter, Eye, Download, Trash2, Plus, RefreshCw } from 'lucide-react';
+import { RequestDetailsModal } from '../../components/common/RequestDetailsModal';
+import { useAuth } from '../../context/AuthContext';
+import { Search, Filter, Eye, Plus, RefreshCw, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const CATEGORIES = [
@@ -23,14 +23,13 @@ const CATEGORIES = [
 ];
 
 export const MyCertificates: React.FC = () => {
+  const { user } = useAuth();
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<string>('ALL');
   const [status, setStatus] = useState<string>('ALL');
   const [selectedCert, setSelectedCert] = useState<Certificate | null>(null);
-
-  const { showToast } = useNotification();
 
   const fetchCertificates = useCallback(async () => {
     try {
@@ -52,45 +51,26 @@ export const MyCertificates: React.FC = () => {
     fetchCertificates();
   }, [fetchCertificates]);
 
-  const handleDelete = async (id: string, certTitle: string) => {
-    if (!window.confirm(`Are you sure you want to delete "${certTitle}"?`)) return;
-
-    try {
-      const res = await api.delete(`/certificates/${id}`);
-      if (res.data.success) {
-        showToast('Certificate deleted successfully.', 'info');
-        fetchCertificates();
-      }
-    } catch (err: any) {
-      showToast(err.response?.data?.message || 'Failed to delete certificate.', 'error');
-    }
-  };
-
-  const handleDownload = (cert: Certificate) => {
-    const fileUrl = `/api/certificates/${cert.id}/file`;
-    const a = document.createElement('a');
-    a.href = fileUrl;
-    a.download = cert.fileName || `${cert.title}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-6xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
         <div>
-          <h1 className="text-xl font-extrabold text-slate-800 tracking-tight">My Certificates</h1>
-          <p className="text-xs text-slate-500 font-medium mt-1">Manage and track your submitted certificates</p>
+          <span className="text-[10px] font-extrabold text-amber-500 uppercase tracking-wider">
+            STUDENT CERTIFICATE SERVICES
+          </span>
+          <h1 className="text-xl font-black text-slate-800 tracking-tight mt-0.5">My Certificates Roster</h1>
+          <p className="text-xs text-slate-500 font-medium mt-1">
+            Track multi-stage approval (Student → Mentor → Advisor → HOD) and view rejection remarks
+          </p>
         </div>
 
         <Link
           to="/upload"
-          className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-white bg-ksrct-navy hover:bg-ksrct-navyLight rounded-xl shadow-md shadow-ksrct-navy/20 transition-all"
+          className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-slate-900 bg-amber-400 hover:bg-amber-300 rounded-xl shadow-md transition-all cursor-pointer"
         >
-          <Plus className="w-4 h-4 text-ksrct-orange" />
-          <span>Upload Certificate</span>
+          <Plus className="w-4 h-4 text-slate-900" />
+          <span>Submit New Certificate</span>
         </Link>
       </div>
 
@@ -103,7 +83,7 @@ export const MyCertificates: React.FC = () => {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by title, category, description..."
+            placeholder="Search by request ID, title, organization, or category..."
             className="w-full pl-10 pr-3.5 py-2.5 text-xs font-medium rounded-xl border border-slate-300 focus:ring-2 focus:ring-ksrct-navy focus:outline-none bg-slate-50"
           />
         </div>
@@ -114,7 +94,7 @@ export const MyCertificates: React.FC = () => {
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="w-full md:w-44 px-3 py-2.5 text-xs font-semibold rounded-xl border border-slate-300 focus:ring-2 focus:ring-ksrct-navy focus:outline-none bg-slate-50"
+            className="w-full md:w-44 px-3 py-2.5 text-xs font-semibold rounded-xl border border-slate-300 focus:ring-2 focus:ring-ksrct-navy focus:outline-none bg-slate-50 cursor-pointer"
           >
             <option value="ALL">All Categories</option>
             {CATEGORIES.filter((c) => c !== 'ALL').map((cat) => (
@@ -130,34 +110,37 @@ export const MyCertificates: React.FC = () => {
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="w-full md:w-36 px-3 py-2.5 text-xs font-semibold rounded-xl border border-slate-300 focus:ring-2 focus:ring-ksrct-navy focus:outline-none bg-slate-50"
+            className="w-full md:w-36 px-3 py-2.5 text-xs font-semibold rounded-xl border border-slate-300 focus:ring-2 focus:ring-ksrct-navy focus:outline-none bg-slate-50 cursor-pointer"
           >
             <option value="ALL">All Statuses</option>
             <option value="APPROVED">Approved</option>
-            <option value="PENDING">Pending</option>
+            <option value="MENTOR_REVIEW">Mentor Review</option>
+            <option value="ADVISOR_REVIEW">Advisor Review</option>
+            <option value="HOD_REVIEW">HOD Review</option>
             <option value="REJECTED">Rejected</option>
           </select>
         </div>
 
         <button
           onClick={fetchCertificates}
-          className="p-2.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors"
+          className="p-2.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
           title="Refresh List"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
         </button>
       </div>
 
-      {/* Table Container */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      {/* Certificates Table */}
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="border-b border-slate-200 text-slate-500 font-bold bg-slate-50">
-                <th className="py-3.5 px-4">Certificate Title</th>
+                <th className="py-3.5 px-4">Certificate ID</th>
+                <th className="py-3.5 px-4">Title & Event</th>
                 <th className="py-3.5 px-4">Category</th>
                 <th className="py-3.5 px-4">Issue Date</th>
-                <th className="py-3.5 px-4">Uploaded At</th>
+                <th className="py-3.5 px-4">Current Stage</th>
                 <th className="py-3.5 px-4">Status</th>
                 <th className="py-3.5 px-4 text-right">Actions</th>
               </tr>
@@ -165,56 +148,51 @@ export const MyCertificates: React.FC = () => {
             <tbody className="divide-y divide-slate-100 font-medium">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-400">
-                    Loading certificates...
+                  <td colSpan={7} className="py-12 text-center text-slate-400">
+                    Loading your certificates...
                   </td>
                 </tr>
               ) : certificates.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-400">
+                  <td colSpan={7} className="py-12 text-center text-slate-400">
                     No certificates found matching your criteria.
                   </td>
                 </tr>
               ) : (
                 certificates.map((cert) => (
                   <tr key={cert.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3.5 px-4">
+                      <span className="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                        {cert.certificateId || `CERT-${cert.id.substring(0, 6)}`}
+                      </span>
+                    </td>
                     <td className="py-3.5 px-4 font-bold text-slate-900 max-w-xs truncate">
-                      {cert.title}
+                      <div>{cert.title}</div>
+                      <span className="text-[10px] text-slate-400 font-normal">{cert.organization || 'N/A'}</span>
                     </td>
                     <td className="py-3.5 px-4 text-slate-600 font-semibold">{cert.category}</td>
-                    <td className="py-3.5 px-4 text-slate-500">{cert.issuedDate}</td>
-                    <td className="py-3.5 px-4 text-slate-500">
-                      {new Date(cert.uploadedAt).toLocaleDateString()}
+                    <td className="py-3.5 px-4 text-slate-500 font-mono text-[11px]">
+                      {cert.issuedDate || cert.eventDate || 'N/A'}
+                    </td>
+                    <td className="py-3.5 px-4 font-semibold text-slate-700">
+                      {cert.currentStage === 'MENTOR_REVIEW'
+                        ? '● Mentor Review'
+                        : cert.currentStage === 'ADVISOR_REVIEW'
+                        ? '● Advisor Review'
+                        : cert.currentStage === 'HOD_REVIEW'
+                        ? '● HOD Review'
+                        : '✓ Completed'}
                     </td>
                     <td className="py-3.5 px-4">
                       <StatusBadge status={cert.status} />
                     </td>
                     <td className="py-3.5 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={() => setSelectedCert(cert)}
-                          className="p-2 text-slate-600 hover:text-ksrct-navy hover:bg-slate-100 rounded-lg transition-colors"
-                          title="View Details"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDownload(cert)}
-                          className="p-2 text-slate-600 hover:text-ksrct-navy hover:bg-slate-100 rounded-lg transition-colors"
-                          title="Download"
-                        >
-                          <Download className="w-4 h-4" />
-                        </button>
-                        {cert.status === 'PENDING' && (
-                          <button
-                            onClick={() => handleDelete(cert.id, cert.title)}
-                            className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors"
-                            title="Delete Pending Certificate"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
+                      <button
+                        onClick={() => setSelectedCert(cert)}
+                        className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold shadow transition-colors flex items-center space-x-1 ml-auto cursor-pointer"
+                      >
+                        <Eye className="w-3.5 h-3.5 mr-1" /> View Details
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -224,10 +202,23 @@ export const MyCertificates: React.FC = () => {
         </div>
       </div>
 
-      {/* Viewer Modal */}
+      {/* Details & Timeline Modal */}
       {selectedCert && (
-        <CertificateViewerModal certificate={selectedCert} onClose={() => setSelectedCert(null)} />
+        <RequestDetailsModal
+          isOpen={Boolean(selectedCert)}
+          onClose={() => setSelectedCert(null)}
+          request={selectedCert}
+          requestType="CERTIFICATE"
+          currentUser={{
+            id: user?.id || '',
+            role: user?.role || 'STUDENT',
+            name: user?.name || '',
+          }}
+          onRefresh={fetchCertificates}
+        />
       )}
     </div>
   );
 };
+
+export default MyCertificates;

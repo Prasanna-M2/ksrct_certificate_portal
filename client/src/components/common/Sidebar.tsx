@@ -8,14 +8,14 @@ import {
   Upload,
   User,
   Bell,
-  HelpCircle,
   LogOut,
   Users,
   CheckSquare,
   FileSpreadsheet,
   ShieldAlert,
-  Settings,
   X,
+  Building,
+  GraduationCap,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -33,56 +33,82 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     navigate('/login');
   };
 
+  const responsibilities = user?.responsibilities || [];
+  const isHod = responsibilities.includes('HOD') || user?.role === 'HOD';
+  const isAdvisor = responsibilities.includes('ADVISOR') || user?.role === 'ADVISOR';
+  const isMentor = responsibilities.includes('MENTOR') || user?.role === 'MENTOR';
+
   const getStudentLinks = () => [
-    { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/dashboard', label: 'Student Dashboard', icon: LayoutDashboard },
     { to: '/my-certificates', label: 'My Certificates', icon: Award },
-    { to: '/upload', label: 'Upload Certificate', icon: Upload },
-    { to: '/profile', label: 'My Profile', icon: User },
+    { to: '/student/od', label: 'On-Duty Applications', icon: CheckSquare },
+    { to: '/upload', label: 'Submit Certificate', icon: Upload },
+    { to: '/profile', label: 'Profile & Academics', icon: User },
     { to: '/notifications', label: 'Notifications', icon: Bell, badge: unreadCount },
-    { to: '/support', label: 'Help & Support', icon: HelpCircle },
   ];
 
-  const getHodLinks = () => [
-    { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/hod/pending', label: 'Pending Verification', icon: CheckSquare },
-    { to: '/hod/students', label: 'Students', icon: Users },
-    { to: '/hod/certificates', label: 'Certificates', icon: Award },
-    { to: '/hod/reports', label: 'Reports', icon: FileSpreadsheet },
+  const getStaffLinks = () => {
+    const links: any[] = [
+      { to: '/dashboard', label: 'Staff Dashboard', icon: LayoutDashboard },
+    ];
+
+    if (isMentor) {
+      links.push({ to: '/mentor/students', label: 'My Mentees Scope', icon: Users });
+    }
+
+    if (isAdvisor) {
+      links.push({ to: '/advisor/students', label: 'My Class Scope', icon: GraduationCap });
+    }
+
+    if (isHod) {
+      links.push({ to: '/hod/students', label: 'EEE Department Scope', icon: Building });
+      links.push({ to: '/hod/reports', label: 'Department Reports', icon: FileSpreadsheet });
+    }
+
+    links.push({ to: '/notifications', label: 'Notifications', icon: Bell, badge: unreadCount });
+    return links;
+  };
+
+  const getCreatorLinks = () => [
+    { to: '/dashboard', label: 'Creator Dashboard', icon: LayoutDashboard },
+    { to: '/admin/users', label: 'EEE Structure & Staff', icon: Building },
+    { to: '/creator/workspace', label: 'Certificate Formats', icon: Award },
+    { to: '/hod/reports', label: 'System Analytics', icon: FileSpreadsheet },
+    { to: '/admin/audit-logs', label: 'Audit Trail', icon: ShieldAlert },
     { to: '/notifications', label: 'Notifications', icon: Bell, badge: unreadCount },
-    { to: '/support', label: 'Help & Support', icon: HelpCircle },
   ];
 
-  const getAdminLinks = () => [
-    { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/admin/users', label: 'Manage Users', icon: Users },
-    { to: '/hod/certificates', label: 'All Certificates', icon: Award },
-    { to: '/hod/reports', label: 'System Reports', icon: FileSpreadsheet },
-    { to: '/admin/audit-logs', label: 'Audit Logs', icon: ShieldAlert },
-    { to: '/notifications', label: 'Notifications', icon: Bell, badge: unreadCount },
-    { to: '/support', label: 'Support Tickets', icon: HelpCircle },
-  ];
+  let navItems = getStudentLinks();
 
-  const navItems =
+  if (user?.role === 'STAFF' || user?.role === 'MENTOR' || user?.role === 'ADVISOR' || user?.role === 'HOD') {
+    navItems = getStaffLinks();
+  } else if (user?.role === 'ADMIN' || user?.role === 'CREATOR') {
+    navItems = getCreatorLinks();
+  }
+
+  const roleLabel =
     user?.role === 'STUDENT'
-      ? getStudentLinks()
-      : user?.role === 'HOD'
-      ? getHodLinks()
-      : getAdminLinks();
+      ? 'STUDENT'
+      : user?.role === 'CREATOR' || user?.role === 'ADMIN'
+      ? 'ADMIN / CREATOR'
+      : responsibilities.length > 0
+      ? `STAFF (${responsibilities.join(' • ')})`
+      : 'STAFF';
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-ksrct-navy text-white select-none">
+    <div className="flex flex-col h-full bg-white text-slate-800 select-none border-r border-slate-200">
       {/* Brand Header */}
-      <div className="p-5 border-b border-ksrct-navyLight flex items-center justify-between">
+      <div className="p-4 border-b border-slate-100 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center shadow-md">
+          <div className="w-10 h-10 rounded-2xl bg-white p-1 flex items-center justify-center shadow-xs border border-slate-200">
             <img src="/assets/ksrct-logo.png" alt="KSRCT Logo" className="h-8 w-auto object-contain" />
           </div>
           <div>
-            <h2 className="text-sm font-bold tracking-tight text-white leading-tight">
-              KSRCT PORTAL
+            <h2 className="text-xs font-black tracking-tight text-[#0a4c95] leading-tight uppercase flex items-center gap-1">
+              <span>KSRCT EEE</span>
             </h2>
-            <p className="text-[11px] text-ksrct-orange font-semibold tracking-wide uppercase">
-              {user?.role} PANEL
+            <p className="text-[10px] text-[#f37021] font-black tracking-wider uppercase truncate max-w-[130px]">
+              {roleLabel}
             </p>
           </div>
         </div>
@@ -90,22 +116,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         {onClose && (
           <button
             onClick={onClose}
-            className="lg:hidden p-1.5 text-slate-400 hover:text-white hover:bg-ksrct-navyLight rounded-lg transition-colors"
+            className="lg:hidden p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         )}
       </div>
 
-      {/* Student/HOD Info Banner */}
-      <div className="mx-4 my-4 p-3 rounded-xl bg-ksrct-navyLight/60 border border-ksrct-navyLight flex items-center gap-3">
-        <div className="w-9 h-9 rounded-full bg-ksrct-orange text-white flex items-center justify-center font-bold text-sm shadow-sm flex-shrink-0">
-          {user?.name?.charAt(0)}
+      {/* User Account Info Banner */}
+      <div className="mx-3.5 my-3.5 p-3 rounded-2xl bg-slate-50 border border-slate-200/90 flex items-center gap-3">
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#f37021] to-[#ff8c3b] text-white flex items-center justify-center font-black text-sm shadow-xs flex-shrink-0">
+          {user?.name?.charAt(0) || 'U'}
         </div>
         <div className="min-w-0">
-          <p className="text-xs font-bold text-white truncate">{user?.name}</p>
-          <p className="text-[11px] text-slate-300 truncate">
-            {user?.role === 'STUDENT' ? `Reg: ${user?.registerNumber || 'N/A'}` : user?.department}
+          <p className="text-xs font-bold text-slate-900 truncate">{user?.name}</p>
+          <p className="text-[10px] text-[#0a4c95] font-semibold truncate mt-0.5">
+            {user?.role === 'STUDENT'
+              ? `Reg: ${user?.registerNumber || 'N/A'}`
+              : 'Electrical & Electronics Engg'}
           </p>
         </div>
       </div>
@@ -120,10 +148,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               to={item.to}
               onClick={onClose}
               className={({ isActive }) =>
-                `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                `flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all duration-200 ${
                   isActive
-                    ? 'bg-ksrct-orange text-white shadow-md shadow-ksrct-orange/20 font-bold'
-                    : 'text-slate-300 hover:bg-ksrct-navyLight hover:text-white'
+                    ? 'bg-gradient-to-r from-[#f37021] to-[#e05e0e] text-white shadow-md font-extrabold translate-x-1'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-[#0a4c95]'
                 }`
               }
             >
@@ -132,7 +160,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 <span>{item.label}</span>
               </div>
               {item.badge !== undefined && item.badge > 0 ? (
-                <span className="px-2 py-0.5 text-[10px] font-extrabold bg-white text-ksrct-navy rounded-full">
+                <span className="px-2 py-0.5 text-[10px] font-black bg-[#f37021] text-white rounded-full shadow-xs">
                   {item.badge}
                 </span>
               ) : null}
@@ -142,10 +170,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       </nav>
 
       {/* Logout Footer */}
-      <div className="p-4 border-t border-ksrct-navyLight">
+      <div className="p-4 border-t border-slate-100">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-rose-300 hover:bg-rose-950/40 hover:text-rose-200 transition-colors"
+          className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition-colors cursor-pointer"
         >
           <LogOut className="w-4 h-4" />
           <span>Sign Out</span>
@@ -157,15 +185,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:block w-64 flex-shrink-0 min-h-screen sticky top-0 h-screen z-20 shadow-xl">
+      <aside className="hidden lg:block w-64 flex-shrink-0 min-h-screen sticky top-0 h-screen z-20 shadow-xs bg-white">
         {sidebarContent}
       </aside>
 
       {/* Mobile Drawer Overlay */}
       {isOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
-          <div className="relative flex-1 max-w-xs w-full bg-ksrct-navy z-10 shadow-2xl">
+          <div className="fixed inset-0 bg-slate-900/30 backdrop-blur-xs" onClick={onClose} />
+          <div className="relative flex-1 max-w-xs w-full bg-white z-10 shadow-2xl animate-fade-in-up">
             {sidebarContent}
           </div>
         </div>
@@ -173,3 +201,5 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     </>
   );
 };
+
+export default Sidebar;

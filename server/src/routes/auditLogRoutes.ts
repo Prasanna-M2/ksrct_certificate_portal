@@ -5,6 +5,6 @@ import { authenticate, authorize } from '../middleware/auth';
 const router = Router();
 
 router.use(authenticate);
-router.get('/', authorize(['HOD', 'ADMIN']), getAuditLogs);
+router.get('/', authorize(['CREATOR']), getAuditLogs);
 
 export default router;

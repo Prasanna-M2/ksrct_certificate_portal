@@ -1,4 +1,4 @@
-// Prisma Schema for KSRCT Certificate Portal
+// Prisma Schema for KSRCT EEE Department Certificate & Student OD Portal
 
 generator client {
   provider = "prisma-client-js"
@@ -10,83 +10,283 @@ datasource db {
 }
 
 model User {
-  id             String        @id @default(uuid())
+  id             String   @id @default(uuid())
   name           String
-  email          String        @unique
+  email          String   @unique
   passwordHash   String
-  role           String        @default("STUDENT") // STUDENT, HOD, ADMIN
-  department     String        // e.g., "Electrical and Electronics Engineering"
-  year           String?       // I, II, III, IV (for students)
-  registerNumber String?       @unique
+  role           String   @default("STUDENT") // STUDENT, STAFF, CREATOR (Legacy compat: MENTOR, ADVISOR, HOD, ADMIN)
+  department     String   @default("Electrical and Electronics Engineering") // Strictly EEE
+  year           String?  // I, II, III, IV (for students)
+  section        String?  // A, B, No Section
+  registerNumber String?  @unique
+  rollNumber     String?  // e.g. 22EE123
+  stayType       String?  // DAY_SCHOLAR, HOSTELLER
+  semester       String?  // I, II, III, IV, V, VI, VII, VIII
   phone          String?
   profileImage   String?
-  isActive       Boolean       @default(true)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  mentorCapacity Int      @default(6) // Capacity per mentor (typically 4-6)
 
-  certificates   Certificate[]  @relation("StudentCertificates")
-  verifiedCerts  Certificate[]  @relation("VerifiedCertificates")
-  notifications  Notification[]
-  auditLogs      AuditLog[]
-  supportTickets SupportTicket[]
+  mentorId       String?
+  mentor         User?    @relation("FacultyMentor", fields: [mentorId], references: [id], onDelete: SetNull)
+  mentees        User[]   @relation("FacultyMentor")
+
+  advisorId      String?
+  advisor        User?    @relation("ClassAdvisor", fields: [advisorId], references: [id], onDelete: SetNull)
+  advisees       User[]   @relation("ClassAdvisor")
+
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Staff Responsibilities (MENTOR, ADVISOR, HOD)
+  staffResponsibilities StaffResponsibility[] @relation("StaffUserResponsibilities")
+  
+  // Advisor Class/Year Assignments (2 per year)
+  advisorAssignments    AdvisorAssignment[]   @relation("StaffAdvisorAssignments")
+
+  certificates     Certificate[]         @relation("StudentCertificates")
+  verifiedCerts    Certificate[]         @relation("VerifiedCertificates")
+  approvedCerts    Certificate[]         @relation("ApprovedCertificates")
+  issuedCerts      Certificate[]         @relation("IssuedCertificates")
+  createdTemplates CertificateTemplate[] @relation("CreatorTemplates")
+  odRequests       OdRequest[]           @relation("StudentOdRequests")
+  notifications    Notification[]
+  auditLogs        AuditLog[]
+  approvals        Approval[]
+  supportTickets   SupportTicket[]
+}
+
+model StaffResponsibility {
+  id             String   @id @default(uuid())
+  staffId        String
+  staff          User     @relation("StaffUserResponsibilities", fields: [staffId], references: [id], onDelete: Cascade)
+  responsibility String   // MENTOR, ADVISOR, HOD
+  department     String   @default("Electrical and Electronics Engineering")
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([staffId, responsibility])
+  @@index([staffId])
+  @@index([responsibility])
+  @@index([isActive])
+}
+
+model AdvisorAssignment {
+  id         String   @id @default(uuid())
+  staffId    String
+  staff      User     @relation("StaffAdvisorAssignments", fields: [staffId], references: [id], onDelete: Cascade)
+  year       String   // I, II, III, IV
+  section    String?  // A, B, ALL
+  department String   @default("Electrical and Electronics Engineering")
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([staffId, year])
+  @@index([staffId])
+  @@index([year])
+  @@index([isActive])
 }
 
 model Certificate {
-  id              String   @id @default(uuid())
-  studentId       String
-  student         User     @relation("StudentCertificates", fields: [studentId], references: [id], onDelete: Cascade)
-  title           String
-  category        String   // NPTEL, Internship, Workshop, Hackathon, NSS, NCC, Sports, Technical, Academic, Certification, Other
-  description     String?
-  fileName        String
-  filePath        String
-  fileType        String
-  fileSize        Int
-  status          String   @default("PENDING") // PENDING, APPROVED, REJECTED
-  issuedDate      String   // ISO string date or YYYY-MM-DD
-  uploadedAt      DateTime @default(now())
-  verifiedAt      DateTime?
-  verifiedById    String?
-  verifiedBy      User?    @relation("VerifiedCertificates", fields: [verifiedById], references: [id])
-  rejectionReason String?
+  id                String   @id @default(uuid())
+  certificateId     String?  @unique // Format: CERT-2026-0001
+  certificateCode   String?  @unique // e.g. KSRCT-2026-00124 for QR verification
+  studentId         String
+  student           User     @relation("StudentCertificates", fields: [studentId], references: [id], onDelete: Cascade)
+  templateId        String?
+  template          CertificateTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  title             String
+  category          String   // NPTEL, Workshop, Hackathon, Internship, Sports, Technical, Academic, Certification, Other
+  eventName         String?
+  organization      String?
+  eventDate         String?
+  description       String?
+  fileName          String
+  filePath          String
+  fileType          String
+  fileSize          Int
+  supportingFile    String?
+  status            String   @default("SUBMITTED") // DRAFT, SUBMITTED, MENTOR_REVIEW, ADVISOR_REVIEW, HOD_REVIEW, APPROVED, REJECTED, RESUBMITTED
+  currentStage      String   @default("MENTOR_REVIEW") // MENTOR_REVIEW, ADVISOR_REVIEW, HOD_REVIEW, COMPLETED
+  issuedDate        String   // ISO string date or YYYY-MM-DD
+  uploadedAt        DateTime @default(now())
+  updatedAt         DateTime @updatedAt @default(now())
+  verifiedAt        DateTime?
+  verifiedById      String?
+  verifiedBy        User?    @relation("VerifiedCertificates", fields: [verifiedById], references: [id], onDelete: SetNull)
+  approvedAt        DateTime?
+  approvedById      String?
+  approvedBy        User?    @relation("ApprovedCertificates", fields: [approvedById], references: [id], onDelete: SetNull)
+  issuedAt          DateTime?
+  issuedById        String?
+  issuedBy          User?    @relation("IssuedCertificates", fields: [issuedById], references: [id], onDelete: SetNull)
+  rejectionReason   String?
+  rejectedByRole    String?
+  rejectedByName    String?
+  mentorRemarks     String?
+  advisorRemarks    String?
+  hodRemarks        String?
+  correctionRemarks String?
+  qrCodeUrl         String?
 
   @@index([studentId])
   @@index([status])
+  @@index([currentStage])
   @@index([category])
+  @@index([certificateId])
+}
+
+model OdRequest {
+  id                     String   @id @default(uuid())
+  odId                   String?  @unique // Format: OD-2026-0001
+  requestType            String   @default("EVENT_OD") // INTERNSHIP_OD, EVENT_OD, CAMPUS_PERMISSION, LEAVE
+  studentId              String
+  student                User     @relation("StudentOdRequests", fields: [studentId], references: [id], onDelete: Cascade)
+  studentName            String
+  registerNumber         String?
+  rollNumber             String?
+  department             String   @default("Electrical and Electronics Engineering")
+  year                   String   @default("III") // I, II, III, IV
+  section                String   @default("A") // A, B, No Section
+  semester               String   @default("V")
+  stayType               String   @default("DAY_SCHOLAR") // DAY_SCHOLAR, HOSTELLER
+  
+  // OD Form Details
+  eventName              String?
+  eventType              String?  // Technical, Cultural, Sports, Workshop, Conference, Symposium, Other
+  organization           String?
+  venue                  String?
+  odDate                 String?  // Single date or date description
+  startTime              String?
+  endTime                String?
+  numberOfDays           Int      @default(1)
+  purpose                String?
+  description            String?
+  coordinator            String?
+  supportingFile         String?
+
+  // Legacy/Additional Details
+  companyName            String?
+  companyAddress         String?
+  internshipMode         String?
+  organizingBody         String?
+  eventPlace             String?
+  reason                 String?
+  startDate              String?
+  endDate                String?
+  session                String?  @default("FULL_DAY")
+  
+  // Availed Tally
+  availedLeaveCount      Int      @default(0)
+  availedOdCount         Int      @default(0)
+  availedPermissionCount Int      @default(0)
+  
+  attachmentName         String?
+  attachmentPath         String?
+  
+  // Workflow Statuses
+  mentorId               String?
+  advisorId              String?
+  status                 String   @default("SUBMITTED") // DRAFT, SUBMITTED, MENTOR_REVIEW, ADVISOR_REVIEW, HOD_REVIEW, APPROVED, REJECTED, RESUBMITTED
+  currentStage           String   @default("MENTOR_REVIEW") // MENTOR_REVIEW, ADVISOR_REVIEW, HOD_REVIEW, COMPLETED
+  mentorRemarks          String?
+  advisorRemarks         String?
+  hodRemarks             String?
+  rejectionReason        String?
+  rejectedByRole         String?
+  rejectedByName         String?
+
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@index([studentId])
+  @@index([status])
+  @@index([currentStage])
+  @@index([requestType])
+  @@index([odId])
+}
+
+model Approval {
+  id             String   @id @default(uuid())
+  requestType    String   // CERTIFICATE, OD
+  requestId      String
+  approverId     String
+  approverName   String?
+  approverRole   String   // MENTOR, ADVISOR, HOD, STAFF
+  action         String   // APPROVED, REJECTED, RESUBMITTED, SUBMITTED
+  previousStatus String?
+  newStatus      String?
+  remarks        String?
+  actionDate     DateTime @default(now())
+
+  approver       User     @relation(fields: [approverId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+  @@index([approverId])
+}
+
+model CertificateTemplate {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  category    String   @default("Academic")
+  layoutJson  String   // JSON payload defining elements, placeholders, canvas properties
+  status      String   @default("DRAFT") // DRAFT, SUBMITTED, APPROVED, PUBLISHED
+  createdById String
+  createdBy   User     @relation("CreatorTemplates", fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  certificates Certificate[]
+
+  @@index([createdById])
+  @@index([status])
 }
 
 model Notification {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String
-  message   String
-  type      String   @default("INFO") // INFO, SUCCESS, WARNING, ERROR
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  message     String
+  type        String   @default("INFO") // INFO, SUCCESS, WARNING, ERROR
+  requestType String?  // CERTIFICATE, OD
+  requestId   String?
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
 
   @@index([userId])
 }
 
 model AuditLog {
-  id          String   @id @default(uuid())
-  userId      String?
-  userName    String?
-  action      String   // LOGIN, CERTIFICATE_UPLOAD, CERTIFICATE_APPROVED, CERTIFICATE_REJECTED, etc.
-  entityType  String?
-  entityId    String?
-  description String
-  ipAddress   String?
-  createdAt   DateTime @default(now())
+  id             String   @id @default(uuid())
+  userId         String?
+  userName       String?
+  userRole       String?
+  requestType    String?
+  requestId      String?
+  action         String   // LOGIN, LOGOUT, CERTIFICATE_SUBMITTED, MENTOR_APPROVED, ADVISOR_APPROVED, HOD_APPROVED, REJECTED, RESUBMITTED, etc.
+  previousStatus String?
+  newStatus      String?
+  remarks        String?
+  entityType     String?
+  entityId       String?
+  description    String
+  oldValue       String?
+  newValue       String?
+  ipAddress      String?
+  createdAt      DateTime @default(now())
 
-  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   @@index([userId])
 }
 
 model Department {
   id        String   @id @default(uuid())
-  name      String   @unique
-  code      String   @unique
+  name      String   @unique @default("Electrical and Electronics Engineering")
+  code      String   @unique @default("EEE")
   hodId     String?
   createdAt DateTime @default(now())
 }

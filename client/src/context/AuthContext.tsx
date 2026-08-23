@@ -30,12 +30,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setUser(res.data.user);
             localStorage.setItem('ksrct_user', JSON.stringify(res.data.user));
           }
-        } catch (err) {
-          console.log('Backend auth sync info:', err);
-          // Do not logout if local user session exists
-          const savedUser = localStorage.getItem('ksrct_user');
-          if (savedUser) {
-            setUser(JSON.parse(savedUser));
+        } catch (err: any) {
+          if (err.response?.status === 401) {
+            setToken(null);
+            setUser(null);
+            localStorage.removeItem('ksrct_token');
+            localStorage.removeItem('ksrct_user');
+          } else {
+            const savedUser = localStorage.getItem('ksrct_user');
+            if (savedUser) {
+              setUser(JSON.parse(savedUser));
+            }
           }
         }
       }

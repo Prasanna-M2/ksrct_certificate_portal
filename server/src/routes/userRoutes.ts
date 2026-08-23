@@ -1,15 +1,42 @@
 import { Router } from 'express';
-import { getUsers, createUser, updateUserStatus, updateUserRole, updateProfile } from '../controllers/userController';
+import {
+  getUsers,
+  getStaff,
+  getAvailableMentors,
+  getAvailableAdvisors,
+  getEeeStructure,
+  createUser,
+  updateUserStatus,
+  assignStaffResponsibilities,
+  assignYearAdvisors,
+  assignStudentMentorAdvisor,
+  updateProfile,
+  assignMentor,
+  updateUserRole,
+} from '../controllers/userController';
 import { authenticate, authorize } from '../middleware/auth';
 
 const router = Router();
 
 router.use(authenticate);
 
+// Student Profile / Available Selectors
+router.get('/mentors', getAvailableMentors);
+router.get('/advisors', getAvailableAdvisors);
+router.get('/structure', getEeeStructure);
 router.patch('/profile', updateProfile);
-router.get('/', authorize(['HOD', 'ADMIN']), getUsers);
-router.post('/', authorize(['ADMIN']), createUser);
-router.patch('/:id/status', authorize(['ADMIN']), updateUserStatus);
-router.patch('/:id/role', authorize(['ADMIN']), updateUserRole);
+
+// Staff & Student Lists
+router.get('/staff', authorize(['HOD', 'ADMIN', 'CREATOR', 'STAFF']), getStaff);
+router.get('/', authorize(['HOD', 'ADMIN', 'CREATOR', 'STAFF', 'MENTOR', 'ADVISOR']), getUsers);
+
+// Creator & HOD Management
+router.post('/', authorize(['ADMIN', 'CREATOR']), createUser);
+router.patch('/assign-student', authorize(['ADMIN', 'CREATOR', 'HOD']), assignStudentMentorAdvisor);
+router.patch('/assign-mentor', authorize(['ADMIN', 'CREATOR', 'HOD']), assignMentor);
+router.patch('/assign-year-advisors', authorize(['ADMIN', 'CREATOR']), assignYearAdvisors);
+router.patch('/:staffId/responsibilities', authorize(['ADMIN', 'CREATOR']), assignStaffResponsibilities);
+router.patch('/:id/status', authorize(['ADMIN', 'CREATOR']), updateUserStatus);
+router.patch('/:id/role', authorize(['ADMIN', 'CREATOR']), updateUserRole);
 
 export default router;

@@ -7,7 +7,7 @@ const router = Router();
 router.use(authenticate);
 
 router.post('/', createSupportTicket);
-router.get('/', getSupportTickets);
-router.patch('/:id/status', authorize(['ADMIN']), updateTicketStatus);
+router.get('/', authorize(['CREATOR']), getSupportTickets);
+router.patch('/:id/status', authorize(['CREATOR']), updateTicketStatus);
 
 export default router;

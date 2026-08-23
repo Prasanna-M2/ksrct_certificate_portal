@@ -4,9 +4,10 @@ import fs from 'fs';
 import path from 'path';
 
 const prisma = new PrismaClient();
+const EEE_DEPT = 'Electrical and Electronics Engineering';
 
 async function main() {
-  console.log('🌱 Starting database seed...');
+  console.log('🧹 Purging and seeding KSRCT EEE Departmental Portal...');
 
   // Ensure uploads directory exists
   const uploadDir = path.join(__dirname, '../../uploads/certificates');
@@ -14,343 +15,393 @@ async function main() {
     fs.mkdirSync(uploadDir, { recursive: true });
   }
 
-  // Clear existing data
+  // Purge all data in foreign key safe order
+  await prisma.approval.deleteMany();
   await prisma.auditLog.deleteMany();
   await prisma.notification.deleteMany();
+  await prisma.odRequest.deleteMany();
   await prisma.certificate.deleteMany();
+  await prisma.certificateTemplate.deleteMany();
   await prisma.supportTicket.deleteMany();
+  await prisma.advisorAssignment.deleteMany();
+  await prisma.staffResponsibility.deleteMany();
   await prisma.user.deleteMany();
   await prisma.department.deleteMany();
 
-  // Create Departments
-  const deptEEE = await prisma.department.create({
-    data: { name: 'Electrical and Electronics Engineering', code: 'EEE' },
-  });
-  await prisma.department.create({
-    data: { name: 'Computer Science and Engineering', code: 'CSE' },
-  });
-  await prisma.department.create({
-    data: { name: 'Electronics and Communication Engineering', code: 'ECE' },
-  });
-  await prisma.department.create({
-    data: { name: 'Mechanical Engineering', code: 'MECH' },
+  console.log('✅ Purged existing records.');
+
+  // 1. Create EEE Department
+  const dept = await prisma.department.create({
+    data: {
+      name: EEE_DEPT,
+      code: 'EEE',
+    },
   });
 
-  // Password hashes
+  const staffPasswordHash = await bcrypt.hash('Staff@123', 10);
   const studentPasswordHash = await bcrypt.hash('Student@123', 10);
-  const hodPasswordHash = await bcrypt.hash('Hod@123', 10);
-  const adminPasswordHash = await bcrypt.hash('Admin@123', 10);
+  const creatorPasswordHash = await bcrypt.hash('Creator@123', 10);
 
-  // 1. Primary Demo Student - Prasanna M
-  const prasanna = await prisma.user.create({
+  // 2. Master Creator
+  const creator = await prisma.user.create({
     data: {
-      name: 'Prasanna M',
-      email: 'prasanna@student.ksrct.ac.in',
-      passwordHash: studentPasswordHash,
-      role: 'STUDENT',
-      department: 'Electrical and Electronics Engineering',
-      year: 'III',
-      registerNumber: '22EE123',
-      phone: '+91 98765 43210',
+      name: 'Master Creator',
+      email: 'creator@ksrct.ac.in',
+      passwordHash: creatorPasswordHash,
+      role: 'CREATOR',
+      department: EEE_DEPT,
+      phone: '+91 98422 11111',
       isActive: true,
     },
   });
 
-  // Additional Students
-  const rahul = await prisma.user.create({
+  // 3. Exactly 1 Active HOD for EEE (also has MENTOR responsibility with own mentees)
+  const hodUser = await prisma.user.create({
     data: {
-      name: 'Rahul R',
-      email: 'rahul@student.ksrct.ac.in',
-      passwordHash: studentPasswordHash,
-      role: 'STUDENT',
-      department: 'Electrical and Electronics Engineering',
-      year: 'III',
-      registerNumber: '22EE124',
-      phone: '+91 98765 43211',
+      name: 'Dr. K. EEE HOD',
+      email: 'hod@ksrct.ac.in',
+      passwordHash: staffPasswordHash,
+      role: 'STAFF',
+      department: EEE_DEPT,
+      phone: '+91 94433 88888',
+      mentorCapacity: 6,
       isActive: true,
     },
   });
 
-  const kavin = await prisma.user.create({
-    data: {
-      name: 'Kavin K',
-      email: 'kavin@student.ksrct.ac.in',
-      passwordHash: studentPasswordHash,
-      role: 'STUDENT',
-      department: 'Electrical and Electronics Engineering',
-      year: 'II',
-      registerNumber: '23EE045',
-      phone: '+91 98765 43212',
-      isActive: true,
-    },
-  });
-
-  const divya = await prisma.user.create({
-    data: {
-      name: 'Divya S',
-      email: 'divya@student.ksrct.ac.in',
-      passwordHash: studentPasswordHash,
-      role: 'STUDENT',
-      department: 'Computer Science and Engineering',
-      year: 'IV',
-      registerNumber: '21CS089',
-      phone: '+91 98765 43213',
-      isActive: true,
-    },
-  });
-
-  // 2. Demo HOD - EEE
-  const hodEEE = await prisma.user.create({
-    data: {
-      name: 'EEE HOD',
-      email: 'hod.eee@ksrct.ac.in',
-      passwordHash: hodPasswordHash,
-      role: 'HOD',
-      department: 'Electrical and Electronics Engineering',
-      phone: '+91 94433 11223',
-      isActive: true,
-    },
-  });
-
-  // Update department with HOD reference
+  // Link HOD in Department & StaffResponsibility
   await prisma.department.update({
-    where: { id: deptEEE.id },
-    data: { hodId: hodEEE.id },
+    where: { id: dept.id },
+    data: { hodId: hodUser.id },
   });
 
-  // 3. Demo Admin
-  const admin = await prisma.user.create({
+  await prisma.staffResponsibility.create({
     data: {
-      name: 'System Administrator',
-      email: 'admin@ksrct.ac.in',
-      passwordHash: adminPasswordHash,
-      role: 'ADMIN',
-      department: 'Administration',
-      phone: '+91 94433 00000',
+      staffId: hodUser.id,
+      responsibility: 'HOD',
+      department: EEE_DEPT,
       isActive: true,
     },
   });
 
-  // Create Sample Dummy File in uploads directory if not present
-  const dummyCertFileName = 'sample_cert_demo.pdf';
-  const dummyFilePath = path.join(uploadDir, dummyCertFileName);
-  if (!fs.existsSync(dummyFilePath)) {
-    fs.writeFileSync(dummyFilePath, '%PDF-1.4 Mock PDF Certificate for KSRCT Certificate Portal');
+  await prisma.staffResponsibility.create({
+    data: {
+      staffId: hodUser.id,
+      responsibility: 'MENTOR',
+      department: EEE_DEPT,
+      isActive: true,
+    },
+  });
+
+  // 4. Create Year Advisors (2 per year: I, II, III, IV)
+  // Year I Advisors
+  const adv1A = await prisma.user.create({
+    data: { name: 'Dr. M. Senthil (Advisor Year I-A)', email: 'advisor1a@ksrct.ac.in', passwordHash: staffPasswordHash, role: 'STAFF', department: EEE_DEPT, phone: '+91 98422 10001', isActive: true },
+  });
+  const adv1B = await prisma.user.create({
+    data: { name: 'Dr. P. Gomathi (Advisor Year I-B)', email: 'advisor1b@ksrct.ac.in', passwordHash: staffPasswordHash, role: 'STAFF', department: EEE_DEPT, phone: '+91 98422 10002', isActive: true },
+  });
+
+  // Year II Advisors
+  const adv2A = await prisma.user.create({
+    data: { name: 'Dr. R. Karthik (Advisor Year II-A)', email: 'advisor2a@ksrct.ac.in', passwordHash: staffPasswordHash, role: 'STAFF', department: EEE_DEPT, phone: '+91 98422 20001', isActive: true },
+  });
+  const adv2B = await prisma.user.create({
+    data: { name: 'Dr. N. Balamurugan (Advisor Year II-B)', email: 'advisor2b@ksrct.ac.in', passwordHash: staffPasswordHash, role: 'STAFF', department: EEE_DEPT, phone: '+91 98422 20002', isActive: true },
+  });
+
+  // Year III Advisors (adv3A also acts as Mentor for special multi-responsibility testing!)
+  const adv3A = await prisma.user.create({
+    data: { name: 'Dr. Venkatesan (Advisor Year III-A & Mentor)', email: 'advisor@ksrct.ac.in', passwordHash: staffPasswordHash, role: 'STAFF', department: EEE_DEPT, phone: '+91 98422 30001', mentorCapacity: 6, isActive: true },
+  });
+  const adv3B = await prisma.user.create({
+    data: { name: 'Dr. S. Sundaram (Advisor Year III-B)', email: 'advisor3b@ksrct.ac.in', passwordHash: staffPasswordHash, role: 'STAFF', department: EEE_DEPT, phone: '+91 98422 30002', isActive: true },
+  });
+
+  // Year IV Advisors
+  const adv4A = await prisma.user.create({
+    data: { name: 'Dr. C. Rajesh (Advisor Year IV-A)', email: 'advisor4a@ksrct.ac.in', passwordHash: staffPasswordHash, role: 'STAFF', department: EEE_DEPT, phone: '+91 98422 40001', isActive: true },
+  });
+  const adv4B = await prisma.user.create({
+    data: { name: 'Dr. A. Meenakshi (Advisor Year IV-B)', email: 'advisor4b@ksrct.ac.in', passwordHash: staffPasswordHash, role: 'STAFF', department: EEE_DEPT, phone: '+91 98422 40002', isActive: true },
+  });
+
+  // 5. Additional Dedicated Faculty Mentors
+  const mentor1 = await prisma.user.create({
+    data: { name: 'Prof. R. Faculty Mentor', email: 'mentor@ksrct.ac.in', passwordHash: staffPasswordHash, role: 'STAFF', department: EEE_DEPT, phone: '+91 94433 99991', mentorCapacity: 6, isActive: true },
+  });
+  const mentor2 = await prisma.user.create({
+    data: { name: 'Prof. K. Anand (Mentor B)', email: 'mentor2@ksrct.ac.in', passwordHash: staffPasswordHash, role: 'STAFF', department: EEE_DEPT, phone: '+91 94433 99992', mentorCapacity: 6, isActive: true },
+  });
+
+  // Assign Staff Responsibilities & Advisor Assignments
+  const allAdvisorsWithYears = [
+    { staff: adv1A, year: 'I', section: 'A' },
+    { staff: adv1B, year: 'I', section: 'B' },
+    { staff: adv2A, year: 'II', section: 'A' },
+    { staff: adv2B, year: 'II', section: 'B' },
+    { staff: adv3A, year: 'III', section: 'A' },
+    { staff: adv3B, year: 'III', section: 'B' },
+    { staff: adv4A, year: 'IV', section: 'A' },
+    { staff: adv4B, year: 'IV', section: 'B' },
+  ];
+
+  for (const item of allAdvisorsWithYears) {
+    await prisma.staffResponsibility.create({
+      data: { staffId: item.staff.id, responsibility: 'ADVISOR', department: EEE_DEPT, isActive: true },
+    });
+    await prisma.advisorAssignment.create({
+      data: { staffId: item.staff.id, year: item.year, section: item.section, department: EEE_DEPT, isActive: true },
+    });
   }
 
-  // Create Initial Seed Certificates for Prasanna
-  await prisma.certificate.createMany({
-    data: [
-      {
-        studentId: prasanna.id,
-        title: 'NPTEL - Internet of Things',
-        category: 'NPTEL',
-        description: '12-week NPTEL Online Certification Course completed with Elite status.',
-        fileName: dummyCertFileName,
-        filePath: `/uploads/certificates/${dummyCertFileName}`,
-        fileType: 'application/pdf',
-        fileSize: 1024 * 450,
-        status: 'APPROVED',
-        issuedDate: '2026-07-20',
-        uploadedAt: new Date('2026-07-21T10:00:00Z'),
-        verifiedAt: new Date('2026-07-22T14:30:00Z'),
-        verifiedById: hodEEE.id,
-      },
-      {
-        studentId: prasanna.id,
-        title: 'Summer Internship - SCG Exd Tech Pvt. Ltd.',
-        category: 'Internship',
-        description: 'Completed 4-week industrial internship on embedded system automation.',
-        fileName: dummyCertFileName,
-        filePath: `/uploads/certificates/${dummyCertFileName}`,
-        fileType: 'application/pdf',
-        fileSize: 1024 * 720,
-        status: 'PENDING',
-        issuedDate: '2026-07-18',
-        uploadedAt: new Date('2026-07-20T11:15:00Z'),
-      },
-      {
-        studentId: prasanna.id,
-        title: 'Workshop on PLC & SCADA',
-        category: 'Workshop',
-        description: 'Two-day hands-on workshop organized by IEEE KSRCT Student Branch.',
-        fileName: dummyCertFileName,
-        filePath: `/uploads/certificates/${dummyCertFileName}`,
-        fileType: 'application/pdf',
-        fileSize: 1024 * 310,
-        status: 'APPROVED',
-        issuedDate: '2026-07-15',
-        uploadedAt: new Date('2026-07-16T09:20:00Z'),
-        verifiedAt: new Date('2026-07-17T11:00:00Z'),
-        verifiedById: hodEEE.id,
-      },
-      {
-        studentId: prasanna.id,
-        title: 'AICTE IDE Bootcamp',
-        category: 'Hackathon',
-        description: 'National Level Innovation & Design Hackathon runner up.',
-        fileName: dummyCertFileName,
-        filePath: `/uploads/certificates/${dummyCertFileName}`,
-        fileType: 'application/pdf',
-        fileSize: 1024 * 512,
-        status: 'REJECTED',
-        issuedDate: '2026-07-10',
-        uploadedAt: new Date('2026-07-11T16:45:00Z'),
-        verifiedAt: new Date('2026-07-12T10:15:00Z'),
-        verifiedById: hodEEE.id,
-        rejectionReason: 'Certificate seal is blurry. Please upload a high-resolution clear scan copy.',
-      },
-      {
-        studentId: prasanna.id,
-        title: 'NSS Special Camp Participation',
-        category: 'NSS',
-        description: '7-day rural development camp held at Erode district.',
-        fileName: dummyCertFileName,
-        filePath: `/uploads/certificates/${dummyCertFileName}`,
-        fileType: 'application/pdf',
-        fileSize: 1024 * 280,
-        status: 'APPROVED',
-        issuedDate: '2026-07-05',
-        uploadedAt: new Date('2026-07-06T08:30:00Z'),
-        verifiedAt: new Date('2026-07-07T15:20:00Z'),
-        verifiedById: hodEEE.id,
-      },
-    ],
+  // Assign Mentor responsibilities
+  await prisma.staffResponsibility.create({
+    data: { staffId: adv3A.id, responsibility: 'MENTOR', department: EEE_DEPT, isActive: true },
+  });
+  await prisma.staffResponsibility.create({
+    data: { staffId: mentor1.id, responsibility: 'MENTOR', department: EEE_DEPT, isActive: true },
+  });
+  await prisma.staffResponsibility.create({
+    data: { staffId: mentor2.id, responsibility: 'MENTOR', department: EEE_DEPT, isActive: true },
   });
 
-  // Seed certificates for Rahul
-  await prisma.certificate.createMany({
-    data: [
-      {
-        studentId: rahul.id,
-        title: 'Electric Vehicle Design Workshop',
-        category: 'Workshop',
-        description: 'National level technical workshop on EV Powertrain architecture.',
-        fileName: dummyCertFileName,
-        filePath: `/uploads/certificates/${dummyCertFileName}`,
-        fileType: 'application/pdf',
-        fileSize: 1024 * 350,
-        status: 'APPROVED',
-        issuedDate: '2026-06-25',
-        uploadedAt: new Date('2026-06-26T14:10:00Z'),
-        verifiedAt: new Date('2026-06-28T09:30:00Z'),
-        verifiedById: hodEEE.id,
-      },
-      {
-        studentId: rahul.id,
-        title: 'NPTEL - Power Electronics',
-        category: 'NPTEL',
-        description: '8-week online certification course.',
-        fileName: dummyCertFileName,
-        filePath: `/uploads/certificates/${dummyCertFileName}`,
-        fileType: 'application/pdf',
-        fileSize: 1024 * 600,
-        status: 'PENDING',
-        issuedDate: '2026-08-01',
-        uploadedAt: new Date('2026-08-02T12:00:00Z'),
-      },
-    ],
-  });
-
-  // Seed certificates for Kavin
-  await prisma.certificate.createMany({
-    data: [
-      {
-        studentId: kavin.id,
-        title: 'MATLAB Simulation Training',
-        category: 'Technical',
-        description: '30-hour course on Simulink and control systems.',
-        fileName: dummyCertFileName,
-        filePath: `/uploads/certificates/${dummyCertFileName}`,
-        fileType: 'application/pdf',
-        fileSize: 1024 * 420,
-        status: 'PENDING',
-        issuedDate: '2026-08-05',
-        uploadedAt: new Date('2026-08-06T15:30:00Z'),
-      },
-    ],
-  });
-
-  // Seed Notifications
-  await prisma.notification.createMany({
-    data: [
-      {
-        userId: prasanna.id,
-        title: 'Certificate Approved',
-        message: 'Your certificate "NPTEL - Internet of Things" has been verified and approved by EEE HOD.',
-        type: 'SUCCESS',
-        isRead: false,
-      },
-      {
-        userId: prasanna.id,
-        title: 'Certificate Action Required',
-        message: 'Your certificate "AICTE IDE Bootcamp" was rejected. Reason: Certificate seal is blurry. Please re-upload.',
-        type: 'WARNING',
-        isRead: false,
-      },
-      {
-        userId: hodEEE.id,
-        title: 'Pending Certificates Awaiting Review',
-        message: 'You have 3 new certificate verification requests from students in your department.',
-        type: 'INFO',
-        isRead: false,
-      },
-    ],
-  });
-
-  // Seed Audit Logs
-  await prisma.auditLog.createMany({
-    data: [
-      {
-        userId: prasanna.id,
-        userName: 'Prasanna M',
-        action: 'CERTIFICATE_UPLOAD',
-        entityType: 'Certificate',
-        description: 'Uploaded certificate "Summer Internship - SCG Exd Tech Pvt. Ltd."',
-        ipAddress: '127.0.0.1',
-        createdAt: new Date('2026-07-20T11:15:00Z'),
-      },
-      {
-        userId: hodEEE.id,
-        userName: 'EEE HOD',
-        action: 'CERTIFICATE_APPROVED',
-        entityType: 'Certificate',
-        description: 'Approved certificate "NPTEL - Internet of Things" for student Prasanna M',
-        ipAddress: '127.0.0.1',
-        createdAt: new Date('2026-07-22T14:30:00Z'),
-      },
-      {
-        userId: hodEEE.id,
-        userName: 'EEE HOD',
-        action: 'CERTIFICATE_REJECTED',
-        entityType: 'Certificate',
-        description: 'Rejected certificate "AICTE IDE Bootcamp" for student Prasanna M (Blurry seal)',
-        ipAddress: '127.0.0.1',
-        createdAt: new Date('2026-07-12T10:15:00Z'),
-      },
-    ],
-  });
-
-  // Seed Support Ticket
-  await prisma.supportTicket.create({
+  // 6. Create Students for Years I, II, III, IV
+  // Student 1 (Year III, Mentor: mentor1, Advisor: adv3A)
+  const student1 = await prisma.user.create({
     data: {
-      userId: prasanna.id,
-      subject: 'Correction in Register Number',
-      message: 'Hello Admin, my register number is showing 22EE123, please verify if my section is mapped correctly.',
-      status: 'OPEN',
+      name: 'Prasanna M',
+      email: 'student1@ksrct.ac.in',
+      passwordHash: studentPasswordHash,
+      role: 'STUDENT',
+      department: EEE_DEPT,
+      year: 'III',
+      section: 'A',
+      registerNumber: '24EE042',
+      rollNumber: '24EE042',
+      stayType: 'DAY_SCHOLAR',
+      semester: 'V',
+      phone: '+91 98765 43210',
+      mentorId: mentor1.id,
+      advisorId: adv3A.id,
+      isActive: true,
     },
   });
 
-  console.log('✅ Database seed completed successfully!');
-  console.log('🔑 Credentials summary:');
-  console.log('   - Student: prasanna@student.ksrct.ac.in / Student@123');
-  console.log('   - HOD:     hod.eee@ksrct.ac.in / Hod@123');
-  console.log('   - Admin:   admin@ksrct.ac.in / Admin@123');
+  // Student 2 (Year II, Mentor: mentor1, Advisor: adv2A)
+  const student2 = await prisma.user.create({
+    data: {
+      name: 'Kavitha S',
+      email: 'student2@ksrct.ac.in',
+      passwordHash: studentPasswordHash,
+      role: 'STUDENT',
+      department: EEE_DEPT,
+      year: 'II',
+      section: 'A',
+      registerNumber: '24EE043',
+      rollNumber: '24EE043',
+      stayType: 'HOSTELLER',
+      semester: 'III',
+      phone: '+91 98765 43211',
+      mentorId: mentor1.id,
+      advisorId: adv2A.id,
+      isActive: true,
+    },
+  });
+
+  // Student 3 (Year III, Mentor: adv3A [Mentor + Advisor is SAME!], Advisor: adv3A)
+  const student3 = await prisma.user.create({
+    data: {
+      name: 'Arun Kumar',
+      email: 'student3@ksrct.ac.in',
+      passwordHash: studentPasswordHash,
+      role: 'STUDENT',
+      department: EEE_DEPT,
+      year: 'III',
+      section: 'A',
+      registerNumber: '24EE044',
+      rollNumber: '24EE044',
+      stayType: 'DAY_SCHOLAR',
+      semester: 'V',
+      phone: '+91 98765 43212',
+      mentorId: adv3A.id,
+      advisorId: adv3A.id,
+      isActive: true,
+    },
+  });
+
+  // Student 4 (Year IV, Mentor: hodUser [HOD is Mentor], Advisor: adv4A)
+  const student4 = await prisma.user.create({
+    data: {
+      name: 'Deepa V',
+      email: 'student4@ksrct.ac.in',
+      passwordHash: studentPasswordHash,
+      role: 'STUDENT',
+      department: EEE_DEPT,
+      year: 'IV',
+      section: 'A',
+      registerNumber: '24EE045',
+      rollNumber: '24EE045',
+      stayType: 'HOSTELLER',
+      semester: 'VII',
+      phone: '+91 98765 43213',
+      mentorId: hodUser.id,
+      advisorId: adv4A.id,
+      isActive: true,
+    },
+  });
+
+  // 7. Seed Sample Requests across Workflow Stages
+  // Certificate 1: in MENTOR_REVIEW stage
+  const cert1 = await prisma.certificate.create({
+    data: {
+      certificateId: 'CERT-2026-0001',
+      studentId: student1.id,
+      title: 'NPTEL Online Certification - Electric Vehicles',
+      category: 'NPTEL',
+      eventName: 'NPTEL 8-Week Course',
+      organization: 'IIT Madras',
+      eventDate: '2026-07-15',
+      issuedDate: '2026-08-01',
+      description: 'Scored 85% Elite+Gold in Electric Vehicles & Energy Storage Systems.',
+      fileName: 'nptel_ev_cert.pdf',
+      filePath: '/uploads/certificates/sample_cert.pdf',
+      fileType: 'application/pdf',
+      fileSize: 245000,
+      status: 'SUBMITTED',
+      currentStage: 'MENTOR_REVIEW',
+    },
+  });
+
+  // Certificate 2: in ADVISOR_REVIEW stage (Student 2)
+  const cert2 = await prisma.certificate.create({
+    data: {
+      certificateId: 'CERT-2026-0002',
+      studentId: student2.id,
+      title: 'Workshop on IoT in Power Systems',
+      category: 'Workshop',
+      eventName: 'National Tech Symposium',
+      organization: 'NIT Trichy',
+      eventDate: '2026-08-05',
+      issuedDate: '2026-08-06',
+      description: 'Hands-on training in smart grid communications.',
+      fileName: 'iot_power_cert.pdf',
+      filePath: '/uploads/certificates/sample_cert.pdf',
+      fileType: 'application/pdf',
+      fileSize: 185000,
+      status: 'ADVISOR_REVIEW',
+      currentStage: 'ADVISOR_REVIEW',
+      mentorRemarks: 'Verified participation and grade. Recommended for approval.',
+    },
+  });
+
+  // OD Request 1: in MENTOR_REVIEW stage
+  const od1 = await prisma.odRequest.create({
+    data: {
+      odId: 'OD-2026-0001',
+      requestType: 'EVENT_OD',
+      studentId: student1.id,
+      studentName: student1.name,
+      registerNumber: '24EE042',
+      rollNumber: '24EE042',
+      department: EEE_DEPT,
+      year: 'III',
+      section: 'A',
+      semester: 'V',
+      stayType: 'DAY_SCHOLAR',
+      eventName: 'National Paper Presentation Contest',
+      eventType: 'Technical',
+      organization: 'IEEE Student Branch',
+      venue: 'KSRCT Main Auditorium',
+      odDate: '2026-08-25',
+      startTime: '09:00 AM',
+      endTime: '05:00 PM',
+      numberOfDays: 1,
+      purpose: 'Presenting research paper on Smart Microgrids',
+      description: 'Selected for final round of IEEE State Level Symposium',
+      coordinator: 'Dr. S. Sundaram',
+      status: 'SUBMITTED',
+      currentStage: 'MENTOR_REVIEW',
+      mentorId: mentor1.id,
+      advisorId: adv3A.id,
+    },
+  });
+
+  // Seed Initial Approval and Audit logs
+  await prisma.approval.create({
+    data: {
+      requestType: 'CERTIFICATE',
+      requestId: cert1.id,
+      approverId: student1.id,
+      approverName: student1.name,
+      approverRole: 'STUDENT',
+      action: 'SUBMITTED',
+      previousStatus: 'DRAFT',
+      newStatus: 'MENTOR_REVIEW',
+      remarks: 'Initial Submission',
+    },
+  });
+
+  await prisma.approval.create({
+    data: {
+      requestType: 'CERTIFICATE',
+      requestId: cert2.id,
+      approverId: mentor1.id,
+      approverName: mentor1.name,
+      approverRole: 'MENTOR',
+      action: 'APPROVED',
+      previousStatus: 'MENTOR_REVIEW',
+      newStatus: 'ADVISOR_REVIEW',
+      remarks: 'Verified participation and grade. Recommended for approval.',
+    },
+  });
+
+  await prisma.approval.create({
+    data: {
+      requestType: 'OD',
+      requestId: od1.id,
+      approverId: student1.id,
+      approverName: student1.name,
+      approverRole: 'STUDENT',
+      action: 'SUBMITTED',
+      previousStatus: 'DRAFT',
+      newStatus: 'MENTOR_REVIEW',
+      remarks: 'Initial Submission',
+    },
+  });
+
+  await prisma.auditLog.create({
+    data: {
+      userId: student1.id,
+      userName: student1.name,
+      userRole: 'STUDENT',
+      requestType: 'CERTIFICATE',
+      requestId: cert1.certificateId,
+      action: 'CERTIFICATE_SUBMITTED',
+      description: `Submitted Certificate ${cert1.certificateId}`,
+    },
+  });
+
+  await prisma.auditLog.create({
+    data: {
+      userId: mentor1.id,
+      userName: mentor1.name,
+      userRole: 'MENTOR',
+      requestType: 'CERTIFICATE',
+      requestId: cert2.certificateId,
+      action: 'MENTOR_APPROVED',
+      previousStatus: 'MENTOR_REVIEW',
+      newStatus: 'ADVISOR_REVIEW',
+      description: `Mentor ${mentor1.name} approved Certificate ${cert2.certificateId}`,
+    },
+  });
+
+  console.log('✅ Seed completed successfully with EEE structure (1 HOD, 2 Advisors/year, Mentors, Students, Requests).');
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Seed failed:', e);
+    console.error('❌ Seed error:', e);
     process.exit(1);
   })
   .finally(async () => {

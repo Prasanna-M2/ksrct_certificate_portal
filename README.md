@@ -2,7 +2,7 @@
 
 Official full-stack Student Certificate Management Web Application built for **K.S. Rangasamy College of Technology (Autonomous), Tiruchengode, Tamil Nadu, India**.
 
-![KSRCT Banner](client/public/assets/ksrct-campus.jpg)
+![KSRCT Banner](client/public/ksrct-building.jpg)
 
 ---
 
@@ -44,17 +44,23 @@ Official full-stack Student Certificate Management Web Application built for **K
 
 ---
 
-## 🔑 Demo Login Credentials
+## 🔒 5-Role Security & Authentication Architecture
 
-The database comes pre-seeded with initial test accounts for instant demonstration:
+The portal operates under a strict **5-Role RBAC permission model**:
 
-| Role | Name | Email Address | Password | Department / Details |
-| :--- | :--- | :--- | :--- | :--- |
-| **STUDENT** | Prasanna M | `prasanna@student.ksrct.ac.in` | `Student@123` | Electrical and Electronics Engineering (EEE, III Year, Reg: 22EE123) |
-| **HOD** | EEE HOD | `hod.eee@ksrct.ac.in` | `Hod@123` | Electrical and Electronics Engineering |
-| **ADMIN** | System Administrator | `admin@ksrct.ac.in` | `Admin@123` | Administration |
+| System Role | Display Name | Purpose & Primary Scope |
+| :--- | :--- | :--- |
+| **`STUDENT`** | Student | View profile, request certificates, upload documents, track status, download certificates. |
+| **`CERTIFICATE_COORDINATOR`** | Certificate Coordinator | Review verification queue, verify compliance, approve/reject requests, issue official certificates. |
+| **`HOD`** | HOD | Department-scoped approval queue, view department student history, generate department reports. |
+| **`ADMIN`** | Admin | Global user management, assign roles & departments, system settings, audit logs tracking role transitions. |
+| **`CREATOR`** | Creator | Visual Certificate Designer, layout element placement, dynamic field tag configuration, template publishing. |
 
----
+### 🔑 Unified Credential Login
+- Login requires **Email/Username + Password**.
+- **No role selection dropdown or radio buttons exist on the login page.**
+- Role assignment is performed strictly by the backend from the trusted database record upon successful password hash verification.
+- Initial setup automatically bootstraps an Admin account using `BOOTSTRAP_ADMIN_EMAIL` and `BOOTSTRAP_ADMIN_PASSWORD` defined in `.env`.
 
 ## 🚀 Quick Start & Installation
 

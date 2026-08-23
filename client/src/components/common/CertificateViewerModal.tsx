@@ -25,7 +25,7 @@ export const CertificateViewerModal: React.FC<CertificateViewerModalProps> = ({
 
   if (!certificate) return null;
 
-  const canVerify = (user?.role === 'HOD' || user?.role === 'ADMIN') && certificate.status === 'PENDING';
+  const canVerify = (user?.role === 'STAFF' || user?.role === 'CREATOR' || user?.role === 'HOD' || user?.role === 'MENTOR' || user?.role === 'ADVISOR') && certificate.status !== 'APPROVED' && certificate.status !== 'REJECTED';
   const fileUrl = `/api/certificates/${certificate.id}/file`;
   const isPdf = certificate.fileType?.includes('pdf') || certificate.fileName?.endsWith('.pdf');
 

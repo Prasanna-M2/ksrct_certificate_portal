@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
 import rateLimit from 'express-rate-limit';
+import bcrypt from 'bcryptjs';
 
 import authRoutes from './routes/authRoutes';
 import certificateRoutes from './routes/certificateRoutes';
@@ -13,6 +14,9 @@ import userRoutes from './routes/userRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import auditLogRoutes from './routes/auditLogRoutes';
 import supportRoutes from './routes/supportRoutes';
+import templateRoutes from './routes/templateRoutes';
+import odRoutes from './routes/odRoutes';
+import { prisma } from './utils/prisma';
 
 dotenv.config();
 
@@ -55,6 +59,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/audit-logs', auditLogRoutes);
 app.use('/api/support', supportRoutes);
+app.use('/api/templates', templateRoutes);
+app.use('/api/od', odRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -70,8 +76,36 @@ if (fs.existsSync(clientDistDir)) {
   });
 }
 
-app.listen(PORT, () => {
+// Bootstrap check for Admin account
+const ensureBootstrapAdmin = async () => {
+  try {
+    const adminCount = await prisma.user.count({ where: { role: 'ADMIN' } });
+    if (adminCount === 0) {
+      const email = (process.env.BOOTSTRAP_ADMIN_EMAIL || 'admin@ksrct.ac.in').toLowerCase().trim();
+      const password = process.env.BOOTSTRAP_ADMIN_PASSWORD || 'Admin@ksrct2026';
+      const passwordHash = await bcrypt.hash(password, 10);
+      await prisma.user.create({
+        data: {
+          name: 'System Administrator',
+          email,
+          passwordHash,
+          role: 'ADMIN',
+          department: 'Administration',
+          phone: '+91 94433 00000',
+          isActive: true,
+        },
+      });
+      console.log(`🔑 Created initial Bootstrap Admin: ${email}`);
+    }
+  } catch (err) {
+    console.error('Error checking bootstrap admin:', err);
+  }
+};
+
+app.listen(PORT, async () => {
+  await ensureBootstrapAdmin();
   console.log(`🚀 KSRCT Unified Portal running at http://localhost:${PORT}`);
 });
 
 export default app;
+
