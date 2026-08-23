@@ -72,7 +72,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const getCreatorLinks = () => [
     { to: '/dashboard', label: 'Creator Dashboard', icon: LayoutDashboard },
     { to: '/admin/users', label: 'EEE Structure & Staff', icon: Building },
-    { to: '/creator/workspace', label: 'Certificate Formats', icon: Award },
     { to: '/hod/reports', label: 'System Analytics', icon: FileSpreadsheet },
     { to: '/admin/audit-logs', label: 'Audit Trail', icon: ShieldAlert },
     { to: '/notifications', label: 'Notifications', icon: Bell, badge: unreadCount },
