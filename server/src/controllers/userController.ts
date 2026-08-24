@@ -41,9 +41,9 @@ export const getAvailableMentors = async (req: AuthenticatedRequest, res: Respon
       name: m.name,
       email: m.email,
       phone: m.phone,
-      capacity: m.mentorCapacity || 6,
+      capacity: m.mentorCapacity || 24,
       currentCount: m._count.mentees,
-      isAvailable: m._count.mentees < (m.mentorCapacity || 6),
+      isAvailable: m._count.mentees < (m.mentorCapacity || 24),
     }));
 
     return res.status(200).json({ success: true, mentors: formattedMentors });
@@ -566,7 +566,7 @@ export const updateProfile = async (req: AuthenticatedRequest, res: Response) =>
         return res.status(400).json({ success: false, message: 'Selected mentor does not exist.' });
       }
 
-      const capacity = mentor.mentorCapacity || 6;
+      const capacity = mentor.mentorCapacity || 24;
       if (mentor._count.mentees >= capacity) {
         return res.status(400).json({
           success: false,
@@ -781,4 +781,83 @@ export const assignMentor = async (req: AuthenticatedRequest, res: Response) => 
 
 export const updateUserRole = async (req: AuthenticatedRequest, res: Response) => {
   return assignStaffResponsibilities(req, res);
+};
+
+/**
+ * Creator: Delete User (Student or Staff) and clean up relationships
+ */
+export const deleteUser = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    if (!req.user || (req.user.role !== 'CREATOR' && req.user.role !== 'ADMIN')) {
+      return res.status(403).json({ success: false, message: 'Creator access required.' });
+    }
+
+    const { id } = req.params;
+
+    const userToDelete = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!userToDelete) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+
+    if (userToDelete.role === 'CREATOR') {
+      return res.status(400).json({ success: false, message: 'Master Creator account cannot be deleted.' });
+    }
+
+    // Cascade delete approvals related to this user or their certificates/ODs
+    const certs = await prisma.certificate.findMany({ where: { studentId: id }, select: { id: true } });
+    const ods = await prisma.odRequest.findMany({ where: { studentId: id }, select: { id: true } });
+    const reqIds = [...certs.map((c) => c.id), ...ods.map((o) => o.id)];
+
+    await prisma.approval.deleteMany({
+      where: {
+        OR: [
+          { approverId: id },
+          ...(reqIds.length > 0 ? [{ requestId: { in: reqIds } }] : []),
+        ],
+      },
+    });
+
+    await prisma.certificate.deleteMany({ where: { studentId: id } });
+    await prisma.odRequest.deleteMany({ where: { studentId: id } });
+    await prisma.notification.deleteMany({ where: { userId: id } });
+    await prisma.supportTicket.deleteMany({ where: { userId: id } });
+    await prisma.staffResponsibility.deleteMany({ where: { staffId: id } });
+    await prisma.advisorAssignment.deleteMany({ where: { staffId: id } });
+    await prisma.auditLog.deleteMany({ where: { userId: id } });
+
+    // Unassign mentor or advisor if deleting staff
+    await prisma.user.updateMany({
+      where: { mentorId: id },
+      data: { mentorId: null },
+    });
+    await prisma.user.updateMany({
+      where: { advisorId: id },
+      data: { advisorId: null },
+    });
+
+    await prisma.user.delete({
+      where: { id },
+    });
+
+    await logAudit({
+      userId: req.user.userId,
+      userName: req.user.name,
+      action: 'USER_DELETED',
+      entityType: 'User',
+      entityId: id,
+      description: `Creator ${req.user.name} deleted user ${userToDelete.email} (${userToDelete.name})`,
+      ipAddress: req.ip,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `User ${userToDelete.name} deleted successfully.`,
+    });
+  } catch (error) {
+    console.error('Delete user error:', error);
+    return res.status(500).json({ success: false, message: 'Failed to delete user.' });
+  }
 };

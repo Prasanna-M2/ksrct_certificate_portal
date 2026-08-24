@@ -13,16 +13,19 @@ import {
   updateProfile,
   assignMentor,
   updateUserRole,
+  deleteUser,
 } from '../controllers/userController';
 import { authenticate, authorize } from '../middleware/auth';
 
 const router = Router();
 
+// Public Mentors and Advisors for student registration
+router.get('/mentors', getAvailableMentors);
+router.get('/advisors', getAvailableAdvisors);
+
 router.use(authenticate);
 
 // Student Profile / Available Selectors
-router.get('/mentors', getAvailableMentors);
-router.get('/advisors', getAvailableAdvisors);
 router.get('/structure', getEeeStructure);
 router.patch('/profile', updateProfile);
 
@@ -38,5 +41,6 @@ router.patch('/assign-year-advisors', authorize(['ADMIN', 'CREATOR']), assignYea
 router.patch('/:staffId/responsibilities', authorize(['ADMIN', 'CREATOR']), assignStaffResponsibilities);
 router.patch('/:id/status', authorize(['ADMIN', 'CREATOR']), updateUserStatus);
 router.patch('/:id/role', authorize(['ADMIN', 'CREATOR']), updateUserRole);
+router.delete('/:id', authorize(['ADMIN', 'CREATOR']), deleteUser);
 
 export default router;

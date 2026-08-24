@@ -12,6 +12,7 @@ import {
   Plus,
   Search,
   CheckCircle2,
+  Trash2,
 } from 'lucide-react';
 
 export const AdminPanel: React.FC = () => {
@@ -39,7 +40,7 @@ export const AdminPanel: React.FC = () => {
   const [isMentorRole, setIsMentorRole] = useState(false);
   const [isAdvisorRole, setIsAdvisorRole] = useState(false);
   const [isHodRole, setIsHodRole] = useState(false);
-  const [mentorCapacity, setMentorCapacity] = useState(6);
+  const [mentorCapacity, setMentorCapacity] = useState(24);
   const [savingResponsibilities, setSavingResponsibilities] = useState(false);
 
   const [advisorModalOpen, setAdvisorModalOpen] = useState(false);
@@ -139,7 +140,7 @@ export const AdminPanel: React.FC = () => {
     setIsMentorRole(resps.includes('MENTOR'));
     setIsAdvisorRole(resps.includes('ADVISOR'));
     setIsHodRole(resps.includes('HOD'));
-    setMentorCapacity(staff.mentorCapacity || 6);
+    setMentorCapacity(staff.mentorCapacity || 24);
     setStaffModalOpen(true);
   };
 
@@ -187,6 +188,29 @@ export const AdminPanel: React.FC = () => {
       showToast(err.response?.data?.message || 'Failed to update year advisors.', 'error');
     } finally {
       setSavingAdvisors(false);
+    }
+  };
+
+  const handleDeleteUser = async (userToDelete: User) => {
+    const isStudent = userToDelete.role === 'STUDENT';
+    const confirmMsg = isStudent
+      ? `Are you sure you want to permanently delete student ${userToDelete.name} (${userToDelete.registerNumber || userToDelete.email})? All their certificates and OD records will also be removed.`
+      : `Are you sure you want to delete faculty member ${userToDelete.name} (${userToDelete.email})?`;
+
+    if (!window.confirm(confirmMsg)) {
+      return;
+    }
+
+    try {
+      const res = await api.delete(`/users/${userToDelete.id}`);
+      if (res.data?.success) {
+        showToast(res.data.message || 'User deleted successfully.', 'success');
+        fetchStudents();
+        fetchStaff();
+        fetchStructure();
+      }
+    } catch (err: any) {
+      showToast(err.response?.data?.message || 'Failed to delete user.', 'error');
     }
   };
 
@@ -431,24 +455,63 @@ export const AdminPanel: React.FC = () => {
 
           {/* Mentors Matrix */}
           <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-            <h3 className="text-sm font-black text-slate-900">Faculty Mentors Matrix (Capacity Tracking)</h3>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+              <div>
+                <h3 className="text-sm font-black text-slate-900">Faculty Mentors Matrix (Year-Based Capacity Tracking)</h3>
+                <p className="text-xs text-slate-500 font-semibold">24 Mentees per staff (target: 4 to 6 students per academic year)</p>
+              </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {structureData?.mentors?.map((m: any) => (
-                <div key={m.id} className="p-4 rounded-2xl bg-white border-2 border-slate-200 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs font-black text-slate-900">{m.name}</p>
-                    <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-950 border border-indigo-300">
-                      {m.mentees?.length || 0} / {m.mentorCapacity || 6}
-                    </span>
+              {structureData?.mentors?.map((m: any) => {
+                const totalCap = m.mentorCapacity || 24;
+                const totalMentees = m.mentees?.length || 0;
+                const y1Count = m.mentees?.filter((st: any) => st.year === 'I').length || 0;
+                const y2Count = m.mentees?.filter((st: any) => st.year === 'II').length || 0;
+                const y3Count = m.mentees?.filter((st: any) => st.year === 'III').length || 0;
+                const y4Count = m.mentees?.filter((st: any) => st.year === 'IV').length || 0;
+
+                return (
+                  <div key={m.id} className="p-4 rounded-2xl bg-white border-2 border-slate-200 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-black text-slate-900 truncate max-w-[180px]">{m.name}</p>
+                      <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full border ${
+                        totalMentees >= totalCap
+                          ? 'bg-rose-100 text-rose-950 border-rose-300'
+                          : 'bg-indigo-100 text-indigo-950 border-indigo-300'
+                      }`}>
+                        {totalMentees} / {totalCap}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 font-bold truncate">{m.email}</p>
+                    
+                    {/* Year-Based Mentee Breakdown (4-6 per year) */}
+                    <div className="grid grid-cols-4 gap-1.5 pt-1 text-[10px]">
+                      <div className="bg-slate-50 p-1.5 rounded-xl text-center border border-slate-200">
+                        <p className="text-slate-500 font-bold">Yr I</p>
+                        <p className="font-extrabold text-slate-900">{y1Count}/6</p>
+                      </div>
+                      <div className="bg-slate-50 p-1.5 rounded-xl text-center border border-slate-200">
+                        <p className="text-slate-500 font-bold">Yr II</p>
+                        <p className="font-extrabold text-slate-900">{y2Count}/6</p>
+                      </div>
+                      <div className="bg-slate-50 p-1.5 rounded-xl text-center border border-slate-200">
+                        <p className="text-slate-500 font-bold">Yr III</p>
+                        <p className="font-extrabold text-slate-900">{y3Count}/6</p>
+                      </div>
+                      <div className="bg-slate-50 p-1.5 rounded-xl text-center border border-slate-200">
+                        <p className="text-slate-500 font-bold">Yr IV</p>
+                        <p className="font-extrabold text-slate-900">{y4Count}/6</p>
+                      </div>
+                    </div>
+
+                    <p className="text-[10px] text-slate-500 font-bold pt-0.5">
+                      {totalMentees >= totalCap
+                        ? '● Full capacity reached'
+                        : `○ ${totalCap - totalMentees} total slots remaining`}
+                    </p>
                   </div>
-                  <p className="text-[11px] text-slate-900 font-bold">{m.email}</p>
-                  <p className="text-[10px] text-slate-900 font-black">
-                    {m.mentees?.length >= (m.mentorCapacity || 6)
-                      ? '● At full capacity'
-                      : `○ ${(m.mentorCapacity || 6) - (m.mentees?.length || 0)} slots available`}
-                  </p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
@@ -497,7 +560,7 @@ export const AdminPanel: React.FC = () => {
                           )}
                           {resps.includes('MENTOR') && (
                             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-indigo-100 text-indigo-950 border border-indigo-300">
-                              Mentor ({st._count?.mentees || 0}/{st.mentorCapacity || 6})
+                              Mentor ({st._count?.mentees || 0}/{st.mentorCapacity || 24})
                             </span>
                           )}
                           {resps.length === 0 && (
@@ -505,25 +568,35 @@ export const AdminPanel: React.FC = () => {
                           )}
                         </div>
                       </td>
-                      <td className="py-3 px-4 text-slate-900 font-bold">{st.mentorCapacity || 6} students</td>
+                      <td className="py-3 px-4 text-slate-900 font-bold">{st.mentorCapacity || 24} students (4–6/yr)</td>
                       <td className="py-3 px-4">
                         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${st.isActive ? 'bg-emerald-100 text-emerald-950 border-emerald-300' : 'bg-rose-100 text-rose-950 border-rose-300'}`}>
                           {st.isActive ? 'Active' : 'Disabled'}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-right space-x-2">
+                      <td className="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
                         <button
                           onClick={() => openStaffModal(st)}
-                          className="px-3 py-1 text-xs font-black text-[#0a4c95] bg-slate-100 border border-slate-300 rounded-xl hover:bg-blue-50 cursor-pointer"
+                          className="px-2.5 py-1 text-xs font-black text-[#0a4c95] bg-slate-100 border border-slate-300 rounded-xl hover:bg-blue-50 cursor-pointer"
                         >
                           Edit Roles
                         </button>
                         <button
                           onClick={() => handleToggleStatus(st)}
-                          className={`px-2.5 py-1 text-xs font-black rounded-xl ${st.isActive ? 'text-rose-700 hover:bg-rose-50' : 'text-emerald-700 hover:bg-emerald-50'} cursor-pointer`}
+                          className={`px-2.5 py-1 text-xs font-black rounded-xl border ${st.isActive ? 'text-amber-800 bg-amber-50 border-amber-200 hover:bg-amber-100' : 'text-emerald-800 bg-emerald-50 border-emerald-200 hover:bg-emerald-100'} cursor-pointer`}
                         >
                           {st.isActive ? 'Disable' : 'Enable'}
                         </button>
+                        {st.role !== 'CREATOR' && (
+                          <button
+                            onClick={() => handleDeleteUser(st)}
+                            className="px-2.5 py-1 text-xs font-black text-rose-700 bg-rose-50 border border-rose-200 rounded-xl hover:bg-rose-100 hover:border-rose-300 transition-colors cursor-pointer inline-flex items-center gap-1"
+                            title="Delete Staff"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Delete</span>
+                          </button>
+                        )}
                       </td>
                     </tr>
                   );
@@ -589,7 +662,7 @@ export const AdminPanel: React.FC = () => {
                     <td className="py-3 px-4 text-slate-900 font-bold">Year {st.year || '-'} ({st.section || 'A'})</td>
                     <td className="py-3 px-4 text-slate-900 font-bold">{st.mentor?.name || <span className="text-[#f37021] font-black">Unassigned</span>}</td>
                     <td className="py-3 px-4 text-slate-900 font-bold">{st.advisor?.name || <span className="text-[#f37021] font-black">Unassigned</span>}</td>
-                    <td className="py-3 px-4 text-right space-x-2">
+                    <td className="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
                       <button
                         onClick={() => {
                           setTargetStudent(st);
@@ -597,15 +670,23 @@ export const AdminPanel: React.FC = () => {
                           setReassignAdvisorId(st.advisorId || '');
                           setStudentModalOpen(true);
                         }}
-                        className="px-3 py-1 text-xs font-black text-[#0a4c95] bg-slate-100 border border-slate-300 rounded-xl hover:bg-blue-50 cursor-pointer"
+                        className="px-2.5 py-1 text-xs font-black text-[#0a4c95] bg-slate-100 border border-slate-300 rounded-xl hover:bg-blue-50 cursor-pointer"
                       >
                         Reassign
                       </button>
                       <button
                         onClick={() => handleToggleStatus(st)}
-                        className={`px-2.5 py-1 text-xs font-black rounded-xl ${st.isActive ? 'text-rose-700 hover:bg-rose-50' : 'text-emerald-700 hover:bg-emerald-50'} cursor-pointer`}
+                        className={`px-2.5 py-1 text-xs font-black rounded-xl border ${st.isActive ? 'text-amber-800 bg-amber-50 border-amber-200 hover:bg-amber-100' : 'text-emerald-800 bg-emerald-50 border-emerald-200 hover:bg-emerald-100'} cursor-pointer`}
                       >
                         {st.isActive ? 'Disable' : 'Enable'}
+                      </button>
+                      <button
+                        onClick={() => handleDeleteUser(st)}
+                        className="px-2.5 py-1 text-xs font-black text-rose-700 bg-rose-50 border border-rose-200 rounded-xl hover:bg-rose-100 hover:border-rose-300 transition-colors cursor-pointer inline-flex items-center gap-1"
+                        title="Delete Student"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Delete</span>
                       </button>
                     </td>
                   </tr>
@@ -720,16 +801,22 @@ export const AdminPanel: React.FC = () => {
               </label>
 
               {isMentorRole && (
-                <div className="space-y-1 pt-2">
-                  <label className="block text-xs font-black text-slate-900 uppercase">Max Mentee Capacity</label>
+                <div className="space-y-1.5 pt-2">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-black text-slate-900 uppercase">Max Mentee Capacity</label>
+                    <span className="text-[10px] font-bold text-slate-500">Target: 4 to 6 students / year</span>
+                  </div>
                   <input
                     type="number"
                     value={mentorCapacity}
-                    onChange={(e) => setMentorCapacity(parseInt(e.target.value, 10) || 6)}
+                    onChange={(e) => setMentorCapacity(parseInt(e.target.value, 10) || 24)}
                     min={1}
-                    max={20}
+                    max={50}
                     className="w-full p-3 text-xs font-black rounded-xl border-2 border-slate-300 bg-white text-slate-900"
                   />
+                  <p className="text-[10px] text-slate-500 font-semibold">
+                    Configured for 24 mentees across Years I, II, III, and IV.
+                  </p>
                 </div>
               )}
             </div>
@@ -927,6 +1014,7 @@ export const AdminPanel: React.FC = () => {
                     >
                       <option value="A">A</option>
                       <option value="B">B</option>
+                      <option value="Nil">Nil</option>
                     </select>
                   </div>
                 </div>

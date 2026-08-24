@@ -24,7 +24,9 @@ model User {
   semester       String?  // I, II, III, IV, V, VI, VII, VIII
   phone          String?
   profileImage   String?
-  mentorCapacity Int      @default(6) // Capacity per mentor (typically 4-6)
+  isAccountSetup Boolean  @default(false)
+  authUserId     String?  @unique
+  mentorCapacity Int      @default(24) // Total capacity per mentor (4-6 students per year across Years I-IV)
 
   mentorId       String?
   mentor         User?    @relation("FacultyMentor", fields: [mentorId], references: [id], onDelete: SetNull)

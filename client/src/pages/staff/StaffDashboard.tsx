@@ -297,9 +297,9 @@ export const StaffDashboard: React.FC = () => {
               <div>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Assigned Mentees</p>
                 <p className="text-2xl font-black text-white mt-1">
-                  {statsData?.mentorStats?.totalMentees || 0} / {user?.mentorCapacity || 6}
+                  {statsData?.mentorStats?.totalMentees || 0} / {user?.mentorCapacity || 24}
                 </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">Capacity: {user?.mentorCapacity || 6} slots</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">Capacity: {user?.mentorCapacity || 24} slots (4–6 per year)</p>
               </div>
               <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
                 <Users className="w-6 h-6" />
@@ -772,6 +772,7 @@ export const StaffDashboard: React.FC = () => {
                 <option value="ALL" className="bg-slate-900 text-white">All Sections</option>
                 <option value="A" className="bg-slate-900 text-white">Section A</option>
                 <option value="B" className="bg-slate-900 text-white">Section B</option>
+                <option value="Nil" className="bg-slate-900 text-white">Nil</option>
               </select>
             </div>
           </div>

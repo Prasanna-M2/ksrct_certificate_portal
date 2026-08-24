@@ -290,6 +290,7 @@ export const Profile: React.FC = () => {
                     >
                       <option value="A">Section A</option>
                       <option value="B">Section B</option>
+                      <option value="Nil">Nil</option>
                     </select>
                   </div>
                 </>
