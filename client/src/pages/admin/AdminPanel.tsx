@@ -40,6 +40,7 @@ export const AdminPanel: React.FC = () => {
   const [isMentorRole, setIsMentorRole] = useState(false);
   const [isAdvisorRole, setIsAdvisorRole] = useState(false);
   const [isHodRole, setIsHodRole] = useState(false);
+  const [isCoordinatorRole, setIsCoordinatorRole] = useState(false);
   const [mentorCapacity, setMentorCapacity] = useState(24);
   const [savingResponsibilities, setSavingResponsibilities] = useState(false);
 
@@ -66,6 +67,7 @@ export const AdminPanel: React.FC = () => {
   const [newStaffMentor, setNewStaffMentor] = useState(false);
   const [newStaffAdvisor, setNewStaffAdvisor] = useState(false);
   const [newStaffHod, setNewStaffHod] = useState(false);
+  const [newStaffCoordinator, setNewStaffCoordinator] = useState(false);
   const [creating, setCreating] = useState(false);
 
   const fetchStructure = useCallback(async () => {
@@ -140,6 +142,7 @@ export const AdminPanel: React.FC = () => {
     setIsMentorRole(resps.includes('MENTOR'));
     setIsAdvisorRole(resps.includes('ADVISOR'));
     setIsHodRole(resps.includes('HOD'));
+    setIsCoordinatorRole(resps.includes('COORDINATOR') || resps.includes('CERTIFICATE_COORDINATOR'));
     setMentorCapacity(staff.mentorCapacity || 24);
     setStaffModalOpen(true);
   };
@@ -152,6 +155,7 @@ export const AdminPanel: React.FC = () => {
       if (isMentorRole) resps.push('MENTOR');
       if (isAdvisorRole) resps.push('ADVISOR');
       if (isHodRole) resps.push('HOD');
+      if (isCoordinatorRole) resps.push('COORDINATOR');
 
       const res = await api.patch(`/users/${targetStaff.id}/responsibilities`, {
         responsibilities: resps,
@@ -264,6 +268,7 @@ export const AdminPanel: React.FC = () => {
         if (newStaffMentor) resps.push('MENTOR');
         if (newStaffAdvisor) resps.push('ADVISOR');
         if (newStaffHod) resps.push('HOD');
+        if (newStaffCoordinator) resps.push('COORDINATOR');
       }
 
       const res = await api.post('/users', {
@@ -553,6 +558,11 @@ export const AdminPanel: React.FC = () => {
                               HOD
                             </span>
                           )}
+                          {resps.includes('COORDINATOR') && (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-cyan-100 text-cyan-950 border border-cyan-300">
+                              Certificate Coordinator
+                            </span>
+                          )}
                           {resps.includes('ADVISOR') && (
                             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-orange-100 text-orange-950 border border-orange-300">
                               Advisor
@@ -784,6 +794,19 @@ export const AdminPanel: React.FC = () => {
                 <div>
                   <p className="text-xs font-black text-slate-900">Class Advisor</p>
                   <p className="text-[11px] text-slate-900 font-bold">Can monitor assigned year/class and perform Advisor Review</p>
+                </div>
+              </label>
+
+              <label className="flex items-center gap-3 p-3 rounded-2xl bg-cyan-50/70 border-2 border-cyan-300 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isCoordinatorRole}
+                  onChange={(e) => setIsCoordinatorRole(e.target.checked)}
+                  className="w-4 h-4 text-cyan-600 rounded"
+                />
+                <div>
+                  <p className="text-xs font-black text-cyan-950">Certificate Coordinator</p>
+                  <p className="text-[11px] text-cyan-900 font-bold">Can coordinate department certificates, verify documents, and export reports</p>
                 </div>
               </label>
 
@@ -1021,7 +1044,7 @@ export const AdminPanel: React.FC = () => {
               ) : (
                 <div className="space-y-2 pt-2 border-t border-slate-200">
                   <label className="block text-xs font-black text-slate-900 uppercase">Assign Initial Roles:</label>
-                  <div className="flex gap-4">
+                  <div className="flex gap-4 flex-wrap">
                     <label className="flex items-center gap-2 text-xs font-black text-slate-900 cursor-pointer">
                       <input
                         type="checkbox"
@@ -1043,9 +1066,18 @@ export const AdminPanel: React.FC = () => {
                     <label className="flex items-center gap-2 text-xs font-black text-slate-900 cursor-pointer">
                       <input
                         type="checkbox"
+                        checked={newStaffCoordinator}
+                        onChange={(e) => setNewStaffCoordinator(e.target.checked)}
+                        className="w-4 h-4 text-cyan-600"
+                      />
+                      Coordinator
+                    </label>
+                    <label className="flex items-center gap-2 text-xs font-black text-slate-900 cursor-pointer">
+                      <input
+                        type="checkbox"
                         checked={newStaffHod}
                         onChange={(e) => setNewStaffHod(e.target.checked)}
-                        className="w-4 h-4 text-[#f37021]"
+                        className="w-4 h-4 text-emerald-600"
                       />
                       HOD
                     </label>

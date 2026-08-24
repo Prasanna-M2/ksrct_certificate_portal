@@ -375,11 +375,11 @@ export const assignStaffResponsibilities = async (req: AuthenticatedRequest, res
     await prisma.staffResponsibility.deleteMany({ where: { staffId } });
 
     for (const resp of responsibilities) {
-      if (['MENTOR', 'ADVISOR', 'HOD'].includes(resp)) {
+      if (['MENTOR', 'ADVISOR', 'HOD', 'COORDINATOR', 'CERTIFICATE_COORDINATOR'].includes(resp)) {
         await prisma.staffResponsibility.create({
           data: {
             staffId,
-            responsibility: resp,
+            responsibility: resp === 'CERTIFICATE_COORDINATOR' ? 'COORDINATOR' : resp,
             department: EEE_DEPT,
             isActive: true,
           },
@@ -696,11 +696,11 @@ export const createUser = async (req: AuthenticatedRequest, res: Response) => {
       }
 
       for (const resp of responsibilities) {
-        if (['MENTOR', 'ADVISOR', 'HOD'].includes(resp)) {
+        if (['MENTOR', 'ADVISOR', 'HOD', 'COORDINATOR', 'CERTIFICATE_COORDINATOR'].includes(resp)) {
           await prisma.staffResponsibility.create({
             data: {
               staffId: newUser.id,
-              responsibility: resp,
+              responsibility: resp === 'CERTIFICATE_COORDINATOR' ? 'COORDINATOR' : resp,
               department: EEE_DEPT,
               isActive: true,
             },
