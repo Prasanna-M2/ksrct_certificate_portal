@@ -1,9 +1,8 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../src/utils/prisma';
 import bcrypt from 'bcryptjs';
 import fs from 'fs';
 import path from 'path';
 
-const prisma = new PrismaClient();
 const EEE_DEPT = 'Electrical and Electronics Engineering';
 
 // Official EEE Faculty Members list from Department Records
@@ -28,7 +27,7 @@ const facultyMembers = [
 ];
 
 // Official Students List (2025-29 Batch) – II Year (63 Students)
-const year1Students = [
+const year2Students = [
   { regNo: '2503737710521001', name: 'ABDUL RAHMAN R' },
   { regNo: '2503737710521002', name: 'ARUL S' },
   { regNo: '2503737710521003', name: 'ARUN KUMAR D' },
@@ -95,7 +94,7 @@ const year1Students = [
 ];
 
 // Official Students List (2024-28 Batch) – III Year (64 Students)
-const year2Students = [
+const year3Students = [
   { regNo: '2403737710521001', name: 'AADHITHYA D' },
   { regNo: '2403737710521002', name: 'AKILESH KUMAR K' },
   { regNo: '2403737710521004', name: 'CHANDRU S' },
@@ -163,7 +162,7 @@ const year2Students = [
 ];
 
 // Official Students List (2023-27 Batch) – IV Year (69 Students)
-const year3Students = [
+const year4Students = [
   { regNo: '2303737710521001', name: 'AADITHYA N' },
   { regNo: '2303737710521002', name: 'ARUN M' },
   { regNo: '2303737710521003', name: 'BHARATHRAM R' },
@@ -306,7 +305,7 @@ async function main() {
   const defaultStudentPasswordHash = await bcrypt.hash('Student@123', 10);
 
   // (2025-29 Batch) – II Year
-  for (const st of year1Students) {
+  for (const st of year2Students) {
     await prisma.user.create({
       data: {
         name: st.name,
@@ -326,7 +325,7 @@ async function main() {
   }
 
   // (2024-28 Batch) – III Year
-  for (const st of year2Students) {
+  for (const st of year3Students) {
     await prisma.user.create({
       data: {
         name: st.name,
@@ -346,7 +345,7 @@ async function main() {
   }
 
   // (2023-27 Batch) – IV Year
-  for (const st of year3Students) {
+  for (const st of year4Students) {
     await prisma.user.create({
       data: {
         name: st.name,
@@ -365,7 +364,7 @@ async function main() {
     });
   }
 
-  const totalStudents = year1Students.length + year2Students.length + year3Students.length;
+  const totalStudents = year2Students.length + year3Students.length + year4Students.length;
 
   // Audit Log
   await prisma.auditLog.create({
@@ -378,7 +377,7 @@ async function main() {
     },
   });
 
-  console.log(`🎓 Successfully added ${totalStudents} students (Year II: ${year1Students.length}, Year III: ${year2Students.length}, Year IV: ${year3Students.length}).`);
+  console.log(`🎓 Successfully added ${totalStudents} students (Year II: ${year2Students.length}, Year III: ${year3Students.length}, Year IV: ${year4Students.length}).`);
 }
 
 main()
