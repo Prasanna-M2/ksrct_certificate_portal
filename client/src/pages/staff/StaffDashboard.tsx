@@ -293,101 +293,101 @@ export const StaffDashboard: React.FC = () => {
       {activeTab === 'MENTOR' && isMentor && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="glass-card p-5 rounded-2xl border border-white/10 flex items-center justify-between">
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Assigned Mentees</p>
-                <p className="text-2xl font-black text-white mt-1">
+                <p className="text-[11px] font-black text-slate-700 uppercase tracking-wider">Assigned Mentees</p>
+                <p className="text-2xl font-black text-slate-900 mt-1">
                   {statsData?.mentorStats?.totalMentees || 0} / {user?.mentorCapacity || 24}
                 </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">Capacity: {user?.mentorCapacity || 24} slots (4–6 per year)</p>
+                <p className="text-xs font-bold text-slate-600 mt-0.5">Capacity: {user?.mentorCapacity || 24} slots (4–6 per year)</p>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center justify-center">
                 <Users className="w-6 h-6" />
               </div>
             </div>
 
-            <div className="glass-card p-5 rounded-2xl border border-white/10 flex items-center justify-between">
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Mentor Review Pending</p>
-                <p className="text-2xl font-black text-amber-400 mt-1">
+                <p className="text-[11px] font-black text-[#f37021] uppercase tracking-wider">Mentor Review Pending</p>
+                <p className="text-2xl font-black text-[#f37021] mt-1">
                   {statsData?.mentorStats?.pendingApprovals || 0}
                 </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">
+                <p className="text-xs font-bold text-slate-600 mt-0.5">
                   {statsData?.mentorStats?.pendingCertificates || 0} Certs • {statsData?.mentorStats?.pendingOd || 0} OD
                 </p>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-orange-50 text-[#f37021] border border-orange-200 flex items-center justify-center">
                 <Clock className="w-6 h-6" />
               </div>
             </div>
 
-            <div className="glass-card p-5 rounded-2xl border border-white/10 flex items-center justify-between">
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Approved Requests</p>
-                <p className="text-2xl font-black text-emerald-400 mt-1">
+                <p className="text-[11px] font-black text-emerald-700 uppercase tracking-wider">Approved Requests</p>
+                <p className="text-2xl font-black text-emerald-700 mt-1">
                   {statsData?.mentorStats?.approvedCertificates || 0}
                 </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">Mentee credentials verified</p>
+                <p className="text-xs font-bold text-slate-600 mt-0.5">Mentee credentials verified</p>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center">
                 <CheckCircle className="w-6 h-6" />
               </div>
             </div>
 
-            <div className="glass-card p-5 rounded-2xl border border-white/10 flex items-center justify-between">
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-bold text-rose-400 uppercase tracking-wider">Returned Requests</p>
-                <p className="text-2xl font-black text-rose-400 mt-1">
+                <p className="text-[11px] font-black text-rose-700 uppercase tracking-wider">Returned Requests</p>
+                <p className="text-2xl font-black text-rose-700 mt-1">
                   {statsData?.mentorStats?.rejectedCertificates || 0}
                 </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">Returned for revision</p>
+                <p className="text-xs font-bold text-slate-600 mt-0.5">Returned for revision</p>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center">
                 <XCircle className="w-6 h-6" />
               </div>
             </div>
           </div>
 
           {/* Assigned Mentees Table */}
-          <div className="glass-panel rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
-            <div className="p-5 border-b border-white/10 flex items-center justify-between">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
+            <div className="p-5 border-b border-slate-200 flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-black text-white">My Assigned Mentees Cohort</h3>
-                <p className="text-xs text-slate-400">Mentorship cohort assigned to you</p>
+                <h3 className="text-sm font-black text-slate-900">My Assigned Mentees Cohort</h3>
+                <p className="text-xs font-bold text-slate-600">Mentorship cohort assigned to you</p>
               </div>
-              <span className="text-xs font-bold bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full border border-indigo-500/30">
+              <span className="text-xs font-black bg-indigo-50 text-indigo-900 px-3 py-1 rounded-full border border-indigo-200">
                 {statsData?.mentorStats?.mentees?.length || 0} Students
               </span>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-white/5 text-slate-400 font-bold uppercase text-[10px] tracking-wider border-b border-white/10">
+                <thead className="bg-slate-100 text-slate-900 font-black uppercase text-[11px] tracking-wider border-b border-slate-200">
                   <tr>
-                    <th className="py-3 px-4">Register No</th>
-                    <th className="py-3 px-4">Student Name</th>
-                    <th className="py-3 px-4">Year / Sec</th>
-                    <th className="py-3 px-4">Certificates</th>
-                    <th className="py-3 px-4">OD Requests</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
+                    <th className="py-3.5 px-4 text-slate-900 font-black">Register No</th>
+                    <th className="py-3.5 px-4 text-slate-900 font-black">Student Name</th>
+                    <th className="py-3.5 px-4 text-slate-900 font-black">Year / Sec</th>
+                    <th className="py-3.5 px-4 text-slate-900 font-black">Certificates</th>
+                    <th className="py-3.5 px-4 text-slate-900 font-black">OD Requests</th>
+                    <th className="py-3.5 px-4 text-right text-slate-900 font-black">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5 font-medium text-slate-300">
+                <tbody className="divide-y divide-slate-200 font-bold text-slate-900">
                   {statsData?.mentorStats?.mentees?.length > 0 ? (
                     statsData.mentorStats.mentees.map((mentee: any) => (
-                      <tr key={mentee.id} className="hover:bg-white/5 transition-colors">
-                        <td className="py-3 px-4 font-mono font-bold text-amber-300">{mentee.registerNumber || 'N/A'}</td>
-                        <td className="py-3 px-4 font-bold text-white">{mentee.name}</td>
-                        <td className="py-3 px-4">{mentee.year ? `Year ${mentee.year}` : '-'} ({mentee.section || 'A'})</td>
-                        <td className="py-3 px-4">{mentee._count?.certificates || 0} submitted</td>
-                        <td className="py-3 px-4">{mentee._count?.odRequests || 0} applied</td>
-                        <td className="py-3 px-4 text-right">
+                      <tr key={mentee.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="py-3.5 px-4 font-mono font-black text-[#0a4c95]">{mentee.registerNumber || 'N/A'}</td>
+                        <td className="py-3.5 px-4 font-black text-slate-900">{mentee.name}</td>
+                        <td className="py-3.5 px-4 text-slate-800">{mentee.year ? `Year ${mentee.year}` : '-'} ({mentee.section || 'A'})</td>
+                        <td className="py-3.5 px-4 text-slate-700">{mentee._count?.certificates || 0} submitted</td>
+                        <td className="py-3.5 px-4 text-slate-700">{mentee._count?.odRequests || 0} applied</td>
+                        <td className="py-3.5 px-4 text-right">
                           <button
                             onClick={() => {
                               const fullStudent = studentsList.find((s) => s.id === mentee.id) || mentee;
                               setViewStudentModal(fullStudent);
                             }}
-                            className="px-3 py-1 text-xs font-bold text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 rounded-xl transition-all cursor-pointer"
+                            className="px-3.5 py-1.5 text-xs font-black text-white bg-gradient-to-r from-[#f37021] to-[#d8580d] hover:from-[#ff8133] hover:to-[#e06214] rounded-xl shadow-xs transition-all cursor-pointer"
                           >
                             View Profile
                           </button>
@@ -396,7 +396,7 @@ export const StaffDashboard: React.FC = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={6} className="py-8 text-center text-slate-500 font-medium">
+                      <td colSpan={6} className="py-8 text-center text-slate-600 font-bold">
                         No mentees currently assigned to your account.
                       </td>
                     </tr>
@@ -412,58 +412,58 @@ export const StaffDashboard: React.FC = () => {
       {activeTab === 'ADVISOR' && isAdvisor && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="glass-card p-5 rounded-2xl border border-white/10 flex items-center justify-between">
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">My Class Students</p>
-                <p className="text-2xl font-black text-white mt-1">
+                <p className="text-[11px] font-black text-slate-700 uppercase tracking-wider">My Class Students</p>
+                <p className="text-2xl font-black text-slate-900 mt-1">
                   {statsData?.advisorStats?.totalClassStudents || 0}
                 </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">
+                <p className="text-xs font-bold text-slate-600 mt-0.5">
                   Years: {statsData?.advisorStats?.advisoryYears?.join(', ') || 'Assigned Class'}
                 </p>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-orange-50 text-[#f37021] border border-orange-200 flex items-center justify-center">
                 <GraduationCap className="w-6 h-6" />
               </div>
             </div>
 
-            <div className="glass-card p-5 rounded-2xl border border-white/10 flex items-center justify-between">
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Advisor Review Pending</p>
-                <p className="text-2xl font-black text-amber-400 mt-1">
+                <p className="text-[11px] font-black text-[#f37021] uppercase tracking-wider">Advisor Review Pending</p>
+                <p className="text-2xl font-black text-[#f37021] mt-1">
                   {statsData?.advisorStats?.pendingApprovals || 0}
                 </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">
+                <p className="text-xs font-bold text-slate-600 mt-0.5">
                   {statsData?.advisorStats?.pendingCertificates || 0} Certs • {statsData?.advisorStats?.pendingOd || 0} OD
                 </p>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-orange-50 text-[#f37021] border border-orange-200 flex items-center justify-center">
                 <Clock className="w-6 h-6" />
               </div>
             </div>
 
-            <div className="glass-card p-5 rounded-2xl border border-white/10 flex items-center justify-between">
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Class Approved</p>
-                <p className="text-2xl font-black text-emerald-400 mt-1">
+                <p className="text-[11px] font-black text-emerald-700 uppercase tracking-wider">Class Approved</p>
+                <p className="text-2xl font-black text-emerald-700 mt-1">
                   {statsData?.advisorStats?.approvedCertificates || 0}
                 </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">Total class verified</p>
+                <p className="text-xs font-bold text-slate-600 mt-0.5">Total class verified</p>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center">
                 <CheckCircle className="w-6 h-6" />
               </div>
             </div>
 
-            <div className="glass-card p-5 rounded-2xl border border-white/10 flex items-center justify-between">
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-bold text-rose-400 uppercase tracking-wider">Class Returned</p>
-                <p className="text-2xl font-black text-rose-400 mt-1">
+                <p className="text-[11px] font-black text-rose-700 uppercase tracking-wider">Class Returned</p>
+                <p className="text-2xl font-black text-rose-700 mt-1">
                   {statsData?.advisorStats?.rejectedCertificates || 0}
                 </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">Rejected requests</p>
+                <p className="text-xs font-bold text-slate-600 mt-0.5">Rejected requests</p>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center">
                 <XCircle className="w-6 h-6" />
               </div>
             </div>
@@ -475,80 +475,80 @@ export const StaffDashboard: React.FC = () => {
       {activeTab === 'HOD' && isHod && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="glass-card p-5 rounded-2xl border border-white/10 flex items-center justify-between">
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total EEE Students</p>
-                <p className="text-2xl font-black text-white mt-1">
+                <p className="text-[11px] font-black text-slate-700 uppercase tracking-wider">Total EEE Students</p>
+                <p className="text-2xl font-black text-slate-900 mt-1">
                   {statsData?.hodStats?.totalStudents || 0}
                 </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">Entire department cohort</p>
+                <p className="text-xs font-bold text-slate-600 mt-0.5">Entire department cohort</p>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#0a4c95] border border-blue-200 flex items-center justify-center">
                 <Building className="w-6 h-6" />
               </div>
             </div>
 
-            <div className="glass-card p-5 rounded-2xl border border-white/10 flex items-center justify-between">
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Final HOD Review</p>
-                <p className="text-2xl font-black text-amber-400 mt-1">
+                <p className="text-[11px] font-black text-[#f37021] uppercase tracking-wider">Final HOD Review</p>
+                <p className="text-2xl font-black text-[#f37021] mt-1">
                   {statsData?.hodStats?.pendingApprovals || 0}
                 </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">
+                <p className="text-xs font-bold text-slate-600 mt-0.5">
                   {statsData?.hodStats?.pendingCertificates || 0} Certs • {statsData?.hodStats?.pendingOd || 0} OD
                 </p>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-orange-50 text-[#f37021] border border-orange-200 flex items-center justify-center">
                 <Clock className="w-6 h-6" />
               </div>
             </div>
 
-            <div className="glass-card p-5 rounded-2xl border border-white/10 flex items-center justify-between">
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Department Approved</p>
-                <p className="text-2xl font-black text-emerald-400 mt-1">
+                <p className="text-[11px] font-black text-emerald-700 uppercase tracking-wider">Department Approved</p>
+                <p className="text-2xl font-black text-emerald-700 mt-1">
                   {statsData?.hodStats?.approvedCertificates || 0}
                 </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">Final verified credentials</p>
+                <p className="text-xs font-bold text-slate-600 mt-0.5">Final verified credentials</p>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center">
                 <CheckCircle className="w-6 h-6" />
               </div>
             </div>
 
-            <div className="glass-card p-5 rounded-2xl border border-white/10 flex items-center justify-between">
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-bold text-rose-400 uppercase tracking-wider">Total Rejected</p>
-                <p className="text-2xl font-black text-rose-400 mt-1">
+                <p className="text-[11px] font-black text-rose-700 uppercase tracking-wider">Total Rejected</p>
+                <p className="text-2xl font-black text-rose-700 mt-1">
                   {statsData?.hodStats?.rejectedRequests || 0}
                 </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">Returned across all stages</p>
+                <p className="text-xs font-bold text-slate-600 mt-0.5">Returned across all stages</p>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center">
                 <XCircle className="w-6 h-6" />
               </div>
             </div>
           </div>
 
           {/* Year-wise Distribution Grid */}
-          <div className="glass-panel p-6 rounded-3xl border border-white/10 shadow-xl space-y-4">
-            <h3 className="text-sm font-black text-white">EEE Department Year-wise Cohort</h3>
+          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+            <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">EEE Department Year-wise Cohort</h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="p-4 rounded-2xl glass-card text-center border border-white/10">
-                <p className="text-xs font-bold text-slate-400">1st Year (I EEE)</p>
-                <p className="text-2xl font-black text-white mt-1">{statsData?.hodStats?.yearDistribution?.year1 || 0}</p>
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-center">
+                <p className="text-xs font-black text-slate-700">1st Year (I EEE)</p>
+                <p className="text-2xl font-black text-slate-900 mt-1">{statsData?.hodStats?.yearDistribution?.year1 || 0}</p>
               </div>
-              <div className="p-4 rounded-2xl glass-card text-center border border-white/10">
-                <p className="text-xs font-bold text-slate-400">2nd Year (II EEE)</p>
-                <p className="text-2xl font-black text-white mt-1">{statsData?.hodStats?.yearDistribution?.year2 || 0}</p>
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-center">
+                <p className="text-xs font-black text-slate-700">2nd Year (II EEE)</p>
+                <p className="text-2xl font-black text-slate-900 mt-1">{statsData?.hodStats?.yearDistribution?.year2 || 0}</p>
               </div>
-              <div className="p-4 rounded-2xl glass-card text-center border border-white/10">
-                <p className="text-xs font-bold text-slate-400">3rd Year (III EEE)</p>
-                <p className="text-2xl font-black text-white mt-1">{statsData?.hodStats?.yearDistribution?.year3 || 0}</p>
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-center">
+                <p className="text-xs font-black text-slate-700">3rd Year (III EEE)</p>
+                <p className="text-2xl font-black text-slate-900 mt-1">{statsData?.hodStats?.yearDistribution?.year3 || 0}</p>
               </div>
-              <div className="p-4 rounded-2xl glass-card text-center border border-white/10">
-                <p className="text-xs font-bold text-slate-400">4th Year (IV EEE)</p>
-                <p className="text-2xl font-black text-white mt-1">{statsData?.hodStats?.yearDistribution?.year4 || 0}</p>
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-center">
+                <p className="text-xs font-black text-slate-700">4th Year (IV EEE)</p>
+                <p className="text-2xl font-black text-slate-900 mt-1">{statsData?.hodStats?.yearDistribution?.year4 || 0}</p>
               </div>
             </div>
           </div>
@@ -558,13 +558,13 @@ export const StaffDashboard: React.FC = () => {
       {/* APPROVALS QUEUE (CERTIFICATES & OD) */}
       {(activeTab === 'APPROVALS' || activeTab === 'MENTOR' || activeTab === 'ADVISOR' || activeTab === 'HOD') && (
         <div className="space-y-6">
-          <div className="glass-panel rounded-3xl border border-white/10 shadow-2xl overflow-hidden space-y-6 p-6">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden space-y-6 p-6">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div>
-                <h3 className="text-base font-black text-white">Pending Approvals Queue</h3>
-                <p className="text-xs text-slate-400">Requests requiring your review based on active responsibilities</p>
+                <h3 className="text-base font-black text-slate-900">Pending Approvals Queue</h3>
+                <p className="text-xs font-bold text-slate-600">Requests requiring your review based on active responsibilities</p>
               </div>
-              <span className="text-xs font-extrabold bg-amber-500/15 text-amber-300 px-3.5 py-1 rounded-full border border-amber-500/30">
+              <span className="text-xs font-black bg-orange-100 text-orange-950 px-3.5 py-1 rounded-full border border-orange-300">
                 {pendingCertificates.filter(c => c.status !== 'APPROVED' && c.status !== 'REJECTED').length +
                  pendingOdRequests.filter(o => o.status !== 'APPROVED' && o.status !== 'REJECTED').length} Pending
               </span>
@@ -573,61 +573,61 @@ export const StaffDashboard: React.FC = () => {
             {/* Certificates Sub-Section */}
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <Award className="w-4 h-4 text-amber-400" />
-                <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Certificate Requests</h4>
+                <Award className="w-4 h-4 text-[#f37021]" />
+                <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">Certificate Requests</h4>
               </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-white/5 text-slate-400 font-bold border border-white/10 uppercase text-[10px]">
+                  <thead className="bg-slate-100 text-slate-900 font-black border-y border-slate-200 uppercase text-[11px]">
                     <tr>
-                      <th className="py-2.5 px-3">Cert ID</th>
-                      <th className="py-2.5 px-3">Student</th>
-                      <th className="py-2.5 px-3">Category & Title</th>
-                      <th className="py-2.5 px-3">Stage</th>
-                      <th className="py-2.5 px-3">Status</th>
-                      <th className="py-2.5 px-3 text-right">Review Action</th>
+                      <th className="py-3 px-3 text-slate-900 font-black">Cert ID</th>
+                      <th className="py-3 px-3 text-slate-900 font-black">Student</th>
+                      <th className="py-3 px-3 text-slate-900 font-black">Category & Title</th>
+                      <th className="py-3 px-3 text-slate-900 font-black">Stage</th>
+                      <th className="py-3 px-3 text-slate-900 font-black">Status</th>
+                      <th className="py-3 px-3 text-right text-slate-900 font-black">Review Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5 font-medium">
+                  <tbody className="divide-y divide-slate-200 font-bold text-slate-900">
                     {pendingCertificates.filter(c => c.status !== 'APPROVED' && c.status !== 'REJECTED').length > 0 ? (
                       pendingCertificates
                         .filter(c => c.status !== 'APPROVED' && c.status !== 'REJECTED')
                         .map((cert) => (
-                          <tr key={cert.id} className="hover:bg-white/5 transition-colors">
-                            <td className="py-3 px-3 font-mono font-bold text-amber-300">{cert.certificateId}</td>
-                            <td className="py-3 px-3">
-                              <p className="font-bold text-white">{cert.student?.name}</p>
-                              <p className="text-[11px] text-slate-400">{cert.student?.registerNumber || 'Student'}</p>
+                          <tr key={cert.id} className="hover:bg-slate-50 transition-colors">
+                            <td className="py-3.5 px-3 font-mono font-black text-[#0a4c95]">{cert.certificateId}</td>
+                            <td className="py-3.5 px-3">
+                              <p className="font-black text-slate-900">{cert.student?.name}</p>
+                              <p className="text-[11px] font-bold text-slate-600">{cert.student?.registerNumber || 'Student'}</p>
                             </td>
-                            <td className="py-3 px-3">
-                              <p className="font-bold text-white">{cert.title}</p>
-                              <p className="text-[11px] text-slate-400">{cert.category} • {cert.organization || 'N/A'}</p>
+                            <td className="py-3.5 px-3">
+                              <p className="font-black text-slate-900">{cert.title}</p>
+                              <p className="text-[11px] font-bold text-slate-600">{cert.category} • {cert.organization || 'N/A'}</p>
                             </td>
-                            <td className="py-3 px-3">
-                              <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-white/10 text-slate-300 border border-white/10">
+                            <td className="py-3.5 px-3">
+                              <span className="text-[11px] font-black px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-800 border border-slate-300">
                                 {cert.currentStage?.replace('_', ' ')}
                               </span>
                             </td>
-                            <td className="py-3 px-3">
+                            <td className="py-3.5 px-3">
                               <StatusBadge status={cert.status} />
                             </td>
-                            <td className="py-3 px-3 text-right space-x-2">
+                            <td className="py-3.5 px-3 text-right space-x-2">
                               <button
                                 onClick={() => setSelectedRequest({ type: 'CERTIFICATE', item: cert })}
-                                className="px-3 py-1 text-xs font-bold text-slate-200 glass-card rounded-xl hover:bg-white/15"
+                                className="px-3.5 py-1.5 text-xs font-black text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl transition-colors cursor-pointer"
                               >
                                 View
                               </button>
                               <button
                                 onClick={() => setApprovalModalItem({ type: 'CERTIFICATE', item: cert, isReject: false })}
-                                className="px-3 py-1 text-xs font-extrabold text-slate-950 bg-emerald-400 hover:bg-emerald-300 rounded-xl shadow-glow-emerald cursor-pointer"
+                                className="px-3.5 py-1.5 text-xs font-black text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs cursor-pointer"
                               >
                                 Approve
                               </button>
                               <button
                                 onClick={() => setApprovalModalItem({ type: 'CERTIFICATE', item: cert, isReject: true })}
-                                className="px-3 py-1 text-xs font-extrabold text-white bg-rose-600 hover:bg-rose-500 rounded-xl shadow-xs cursor-pointer"
+                                className="px-3.5 py-1.5 text-xs font-black text-white bg-rose-600 hover:bg-rose-700 rounded-xl shadow-xs cursor-pointer"
                               >
                                 Reject
                               </button>
@@ -636,7 +636,7 @@ export const StaffDashboard: React.FC = () => {
                         ))
                     ) : (
                       <tr>
-                        <td colSpan={6} className="py-6 text-center text-slate-500">
+                        <td colSpan={6} className="py-6 text-center text-slate-600 font-bold">
                           No pending certificate requests in your current queue.
                         </td>
                       </tr>
@@ -647,68 +647,68 @@ export const StaffDashboard: React.FC = () => {
             </div>
 
             {/* OD Requests Sub-Section */}
-            <div className="space-y-3 pt-4 border-t border-white/10">
+            <div className="space-y-3 pt-4 border-t border-slate-200">
               <div className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-cyan-400" />
-                <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">On-Duty (OD) Requests</h4>
+                <FileText className="w-4 h-4 text-[#0a4c95]" />
+                <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">On-Duty (OD) Requests</h4>
               </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-white/5 text-slate-400 font-bold border border-white/10 uppercase text-[10px]">
+                  <thead className="bg-slate-100 text-slate-900 font-black border-y border-slate-200 uppercase text-[11px]">
                     <tr>
-                      <th className="py-2.5 px-3">OD ID</th>
-                      <th className="py-2.5 px-3">Student</th>
-                      <th className="py-2.5 px-3">Event & Purpose</th>
-                      <th className="py-2.5 px-3">Date & Days</th>
-                      <th className="py-2.5 px-3">Stage</th>
-                      <th className="py-2.5 px-3">Status</th>
-                      <th className="py-2.5 px-3 text-right">Review Action</th>
+                      <th className="py-3 px-3 text-slate-900 font-black">OD ID</th>
+                      <th className="py-3 px-3 text-slate-900 font-black">Student</th>
+                      <th className="py-3 px-3 text-slate-900 font-black">Event & Purpose</th>
+                      <th className="py-3 px-3 text-slate-900 font-black">Date & Days</th>
+                      <th className="py-3 px-3 text-slate-900 font-black">Stage</th>
+                      <th className="py-3 px-3 text-slate-900 font-black">Status</th>
+                      <th className="py-3 px-3 text-right text-slate-900 font-black">Review Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5 font-medium">
+                  <tbody className="divide-y divide-slate-200 font-bold text-slate-900">
                     {pendingOdRequests.filter(o => o.status !== 'APPROVED' && o.status !== 'REJECTED').length > 0 ? (
                       pendingOdRequests
                         .filter(o => o.status !== 'APPROVED' && o.status !== 'REJECTED')
                         .map((od) => (
-                          <tr key={od.id} className="hover:bg-white/5 transition-colors">
-                            <td className="py-3 px-3 font-mono font-bold text-amber-300">{od.odId}</td>
-                            <td className="py-3 px-3">
-                              <p className="font-bold text-white">{od.studentName}</p>
-                              <p className="text-[11px] text-slate-400">{od.registerNumber || 'Student'}</p>
+                          <tr key={od.id} className="hover:bg-slate-50 transition-colors">
+                            <td className="py-3.5 px-3 font-mono font-black text-[#0a4c95]">{od.odId}</td>
+                            <td className="py-3.5 px-3">
+                              <p className="font-black text-slate-900">{od.studentName}</p>
+                              <p className="text-[11px] font-bold text-slate-600">{od.registerNumber || 'Student'}</p>
                             </td>
-                            <td className="py-3 px-3">
-                              <p className="font-bold text-white">{od.eventName}</p>
-                              <p className="text-[11px] text-slate-400">{od.purpose || od.eventType}</p>
+                            <td className="py-3.5 px-3">
+                              <p className="font-black text-slate-900">{od.eventName}</p>
+                              <p className="text-[11px] font-bold text-slate-600">{od.purpose || od.eventType}</p>
                             </td>
-                            <td className="py-3 px-3">
-                              <p className="text-white font-bold">{od.odDate}</p>
-                              <p className="text-[11px] text-slate-400">{od.numberOfDays} day(s)</p>
+                            <td className="py-3.5 px-3">
+                              <p className="text-slate-900 font-black">{od.odDate}</p>
+                              <p className="text-[11px] font-bold text-slate-600">{od.numberOfDays} day(s)</p>
                             </td>
-                            <td className="py-3 px-3">
-                              <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-white/10 text-slate-300 border border-white/10">
+                            <td className="py-3.5 px-3">
+                              <span className="text-[11px] font-black px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-800 border border-slate-300">
                                 {od.currentStage?.replace('_', ' ')}
                               </span>
                             </td>
-                            <td className="py-3 px-3">
+                            <td className="py-3.5 px-3">
                               <StatusBadge status={od.status} />
                             </td>
-                            <td className="py-3 px-3 text-right space-x-2">
+                            <td className="py-3.5 px-3 text-right space-x-2">
                               <button
                                 onClick={() => setSelectedRequest({ type: 'OD', item: od })}
-                                className="px-3 py-1 text-xs font-bold text-slate-200 glass-card rounded-xl hover:bg-white/15"
+                                className="px-3.5 py-1.5 text-xs font-black text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl transition-colors cursor-pointer"
                               >
                                 View
                               </button>
                               <button
                                 onClick={() => setApprovalModalItem({ type: 'OD', item: od, isReject: false })}
-                                className="px-3 py-1 text-xs font-extrabold text-slate-950 bg-emerald-400 hover:bg-emerald-300 rounded-xl shadow-glow-emerald cursor-pointer"
+                                className="px-3.5 py-1.5 text-xs font-black text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs cursor-pointer"
                               >
                                 Approve
                               </button>
                               <button
                                 onClick={() => setApprovalModalItem({ type: 'OD', item: od, isReject: true })}
-                                className="px-3 py-1 text-xs font-extrabold text-white bg-rose-600 hover:bg-rose-500 rounded-xl shadow-xs cursor-pointer"
+                                className="px-3.5 py-1.5 text-xs font-black text-white bg-rose-600 hover:bg-rose-700 rounded-xl shadow-xs cursor-pointer"
                               >
                                 Reject
                               </button>
@@ -717,7 +717,7 @@ export const StaffDashboard: React.FC = () => {
                         ))
                     ) : (
                       <tr>
-                        <td colSpan={7} className="py-6 text-center text-slate-500">
+                        <td colSpan={7} className="py-6 text-center text-slate-600 font-bold">
                           No pending OD requests in your current queue.
                         </td>
                       </tr>
@@ -732,80 +732,80 @@ export const StaffDashboard: React.FC = () => {
 
       {/* STUDENT MONITORING TABLE VIEW */}
       {activeTab === 'STUDENTS' && (
-        <div className="glass-panel rounded-3xl border border-white/10 shadow-2xl p-6 space-y-4">
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-xs p-6 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-black text-white">Student Monitoring Interface</h3>
-              <p className="text-xs text-slate-400">Filter and view students within your monitoring scope</p>
+              <h3 className="text-base font-black text-slate-900">Student Monitoring Interface</h3>
+              <p className="text-xs font-bold text-slate-600">Filter and view students within your monitoring scope</p>
             </div>
 
             {/* Filter Bar */}
             <div className="flex items-center gap-2 flex-wrap">
               <div className="relative">
-                <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-500" />
+                <Search className="w-3.5 h-3.5 absolute left-3 top-3 text-slate-500" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search student / reg no..."
-                  className="pl-8 pr-3 py-1.5 text-xs font-medium rounded-xl glass-input"
+                  className="pl-9 pr-3.5 py-2 text-xs font-bold rounded-xl border border-slate-300 bg-white text-slate-900 focus:border-[#f37021] focus:outline-none"
                 />
               </div>
 
               <select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(e.target.value)}
-                className="px-3 py-1.5 text-xs font-medium rounded-xl glass-input cursor-pointer"
+                className="px-3.5 py-2 text-xs font-bold rounded-xl border border-slate-300 bg-white text-slate-900 cursor-pointer focus:border-[#f37021] focus:outline-none"
               >
-                <option value="ALL" className="bg-slate-900 text-white">All Years</option>
-                <option value="I" className="bg-slate-900 text-white">1st Year (I)</option>
-                <option value="II" className="bg-slate-900 text-white">2nd Year (II)</option>
-                <option value="III" className="bg-slate-900 text-white">3rd Year (III)</option>
-                <option value="IV" className="bg-slate-900 text-white">4th Year (IV)</option>
+                <option value="ALL" className="bg-white text-slate-900 font-bold">All Years</option>
+                <option value="I" className="bg-white text-slate-900 font-bold">1st Year (I)</option>
+                <option value="II" className="bg-white text-slate-900 font-bold">2nd Year (II)</option>
+                <option value="III" className="bg-white text-slate-900 font-bold">3rd Year (III)</option>
+                <option value="IV" className="bg-white text-slate-900 font-bold">4th Year (IV)</option>
               </select>
 
               <select
                 value={selectedSection}
                 onChange={(e) => setSelectedSection(e.target.value)}
-                className="px-3 py-1.5 text-xs font-medium rounded-xl glass-input cursor-pointer"
+                className="px-3.5 py-2 text-xs font-bold rounded-xl border border-slate-300 bg-white text-slate-900 cursor-pointer focus:border-[#f37021] focus:outline-none"
               >
-                <option value="ALL" className="bg-slate-900 text-white">All Sections</option>
-                <option value="A" className="bg-slate-900 text-white">Section A</option>
-                <option value="B" className="bg-slate-900 text-white">Section B</option>
-                <option value="Nil" className="bg-slate-900 text-white">Nil</option>
+                <option value="ALL" className="bg-white text-slate-900 font-bold">All Sections</option>
+                <option value="A" className="bg-white text-slate-900 font-bold">Section A</option>
+                <option value="B" className="bg-white text-slate-900 font-bold">Section B</option>
+                <option value="Nil" className="bg-white text-slate-900 font-bold">Nil</option>
               </select>
             </div>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-white/5 text-slate-400 font-bold border-y border-white/10 uppercase text-[10px] tracking-wider">
+              <thead className="bg-slate-100 text-slate-900 font-black border-y border-slate-200 uppercase text-[11px] tracking-wider">
                 <tr>
-                  <th className="py-3 px-4">Register Number</th>
-                  <th className="py-3 px-4">Student Name</th>
-                  <th className="py-3 px-4">Year & Sec</th>
-                  <th className="py-3 px-4">Mentor</th>
-                  <th className="py-3 px-4">Advisor</th>
-                  <th className="py-3 px-4">Activity</th>
-                  <th className="py-3 px-4 text-right">Profile</th>
+                  <th className="py-3.5 px-4 text-slate-900 font-black">Register Number</th>
+                  <th className="py-3.5 px-4 text-slate-900 font-black">Student Name</th>
+                  <th className="py-3.5 px-4 text-slate-900 font-black">Year & Sec</th>
+                  <th className="py-3.5 px-4 text-slate-900 font-black">Mentor</th>
+                  <th className="py-3.5 px-4 text-slate-900 font-black">Advisor</th>
+                  <th className="py-3.5 px-4 text-slate-900 font-black">Activity</th>
+                  <th className="py-3.5 px-4 text-right text-slate-900 font-black">Profile</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5 font-medium text-slate-300">
+              <tbody className="divide-y divide-slate-200 font-bold text-slate-900">
                 {filteredStudents.length > 0 ? (
                   filteredStudents.map((st) => (
-                    <tr key={st.id} className="hover:bg-white/5 transition-colors">
-                      <td className="py-3 px-4 font-mono font-bold text-amber-300">{st.registerNumber || 'N/A'}</td>
-                      <td className="py-3 px-4 font-bold text-white">{st.name}</td>
-                      <td className="py-3 px-4">Year {st.year || '-'} ({st.section || 'A'})</td>
-                      <td className="py-3 px-4 text-slate-300">{st.mentor?.name || 'Unassigned'}</td>
-                      <td className="py-3 px-4 text-slate-300">{st.advisor?.name || 'Unassigned'}</td>
-                      <td className="py-3 px-4 text-slate-400">
+                    <tr key={st.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="py-3.5 px-4 font-mono font-black text-[#0a4c95]">{st.registerNumber || 'N/A'}</td>
+                      <td className="py-3.5 px-4 font-black text-slate-900">{st.name}</td>
+                      <td className="py-3.5 px-4 text-slate-800">Year {st.year || '-'} ({st.section || 'A'})</td>
+                      <td className="py-3.5 px-4 text-slate-900">{st.mentor?.name || <span className="text-slate-400 font-normal">Unassigned</span>}</td>
+                      <td className="py-3.5 px-4 text-slate-900">{st.advisor?.name || <span className="text-slate-400 font-normal">Unassigned</span>}</td>
+                      <td className="py-3.5 px-4 text-slate-700">
                         {st._count?.certificates || 0} Certs • {st._count?.odRequests || 0} OD
                       </td>
-                      <td className="py-3 px-4 text-right">
+                      <td className="py-3.5 px-4 text-right">
                         <button
                           onClick={() => setViewStudentModal(st)}
-                          className="px-3 py-1 text-xs font-bold text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 rounded-xl transition-all cursor-pointer"
+                          className="px-3.5 py-1.5 text-xs font-black text-white bg-gradient-to-r from-[#f37021] to-[#d8580d] hover:from-[#ff8133] hover:to-[#e06214] rounded-xl shadow-xs transition-all cursor-pointer"
                         >
                           View
                         </button>
@@ -814,7 +814,7 @@ export const StaffDashboard: React.FC = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={7} className="py-8 text-center text-slate-500">
+                    <td colSpan={7} className="py-8 text-center text-slate-600 font-bold">
                       No students found matching current filters or within your scope.
                     </td>
                   </tr>
@@ -828,39 +828,39 @@ export const StaffDashboard: React.FC = () => {
       {/* APPROVAL / REJECTION MODAL */}
       {approvalModalItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in-up">
-          <div className="glass-panel rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-white/15 space-y-5">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-5 text-slate-900">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div className="flex items-center gap-2">
                 {approvalModalItem.isReject ? (
-                  <XCircle className="w-5 h-5 text-rose-400" />
+                  <XCircle className="w-5 h-5 text-rose-600" />
                 ) : (
-                  <CheckCircle className="w-5 h-5 text-emerald-400" />
+                  <CheckCircle className="w-5 h-5 text-emerald-600" />
                 )}
-                <h3 className="text-base font-black text-white">
+                <h3 className="text-base font-black text-slate-900">
                   {approvalModalItem.isReject ? 'Reject Request with Reason' : 'Confirm Request Approval'}
                 </h3>
               </div>
               <button
                 onClick={() => setApprovalModalItem(null)}
-                className="text-slate-400 hover:text-white text-lg font-bold"
+                className="text-slate-500 hover:text-slate-900 text-lg font-black"
               >
                 ✕
               </button>
             </div>
 
-            <div className="p-3.5 glass-card rounded-2xl text-xs space-y-1">
-              <p className="font-bold text-white">
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-1 text-slate-900 font-bold">
+              <p className="font-black text-slate-900 text-sm">
                 {approvalModalItem.type === 'CERTIFICATE'
                   ? approvalModalItem.item.title
                   : approvalModalItem.item.eventName}
               </p>
-              <p className="text-slate-400">
+              <p className="text-slate-600 font-bold">
                 ID: {approvalModalItem.item.certificateId || approvalModalItem.item.odId} • Student: {approvalModalItem.item.student?.name || approvalModalItem.item.studentName}
               </p>
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-300">
+              <label className="block text-xs font-black text-slate-900 uppercase">
                 {approvalModalItem.isReject ? 'Mandatory Rejection Remarks / Reason *' : 'Approval Remarks (Optional)'}
               </label>
               <textarea
@@ -872,16 +872,16 @@ export const StaffDashboard: React.FC = () => {
                     : 'Add any remarks or notes...'
                 }
                 rows={3}
-                className="w-full p-3 text-xs font-medium rounded-2xl glass-input"
+                className="w-full p-3 text-xs font-bold rounded-xl border-2 border-slate-300 bg-white text-slate-900 focus:border-[#f37021] focus:outline-none"
                 required={approvalModalItem.isReject}
               />
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-2">
+            <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-200">
               <button
                 type="button"
                 onClick={() => setApprovalModalItem(null)}
-                className="px-4 py-2 text-xs font-bold text-slate-400 hover:bg-white/10 rounded-xl"
+                className="px-4 py-2 text-xs font-black text-slate-700 hover:bg-slate-100 rounded-xl"
               >
                 Cancel
               </button>
@@ -889,10 +889,10 @@ export const StaffDashboard: React.FC = () => {
                 type="button"
                 disabled={actionSubmitting || (approvalModalItem.isReject && !actionRemarks.trim())}
                 onClick={approvalModalItem.isReject ? handleReject : handleApprove}
-                className={`px-5 py-2.5 text-xs font-extrabold rounded-xl shadow-lg transition-all cursor-pointer disabled:opacity-50 ${
+                className={`px-5 py-2.5 text-xs font-black rounded-xl shadow-md transition-all cursor-pointer disabled:opacity-50 ${
                   approvalModalItem.isReject
-                    ? 'bg-rose-600 hover:bg-rose-500 text-white'
-                    : 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-glow-emerald'
+                    ? 'bg-rose-600 hover:bg-rose-700 text-white'
+                    : 'bg-emerald-600 hover:bg-emerald-700 text-white'
                 }`}
               >
                 {actionSubmitting ? 'Processing...' : approvalModalItem.isReject ? 'Confirm Rejection' : 'Confirm Approval'}
@@ -905,50 +905,50 @@ export const StaffDashboard: React.FC = () => {
       {/* STUDENT PROFILE VIEW MODAL */}
       {viewStudentModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in-up">
-          <div className="glass-panel rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-white/15 space-y-5">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-5 text-slate-900">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div className="flex items-center gap-2">
-                <GraduationCap className="w-5 h-5 text-amber-400" />
-                <h3 className="text-base font-black text-white">Student Academic Profile</h3>
+                <GraduationCap className="w-5 h-5 text-[#f37021]" />
+                <h3 className="text-base font-black text-slate-900">Student Academic Profile</h3>
               </div>
               <button
                 onClick={() => setViewStudentModal(null)}
-                className="text-slate-400 hover:text-white text-lg font-bold"
+                className="text-slate-500 hover:text-slate-900 text-lg font-black"
               >
                 ✕
               </button>
             </div>
 
             <div className="space-y-4 text-xs">
-              <div className="flex items-center gap-4 p-4 rounded-2xl glass-card border border-white/10">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-400 text-slate-950 flex items-center justify-center text-xl font-black shadow-glow-gold">
+              <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#f37021] to-[#ff8c3b] text-white flex items-center justify-center text-xl font-black shadow-md">
                   {viewStudentModal.name?.charAt(0)}
                 </div>
                 <div>
-                  <h4 className="text-sm font-black text-white">{viewStudentModal.name}</h4>
-                  <p className="font-mono text-amber-300 font-bold">{viewStudentModal.registerNumber || 'N/A'}</p>
-                  <p className="text-slate-400">Year {viewStudentModal.year || '-'} • Section {viewStudentModal.section || 'A'}</p>
+                  <h4 className="text-sm font-black text-slate-900">{viewStudentModal.name}</h4>
+                  <p className="font-mono text-[#0a4c95] font-black text-xs">{viewStudentModal.registerNumber || 'N/A'}</p>
+                  <p className="text-slate-700 font-bold">Year {viewStudentModal.year || '-'} • Section {viewStudentModal.section || 'A'}</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-3.5 glass-card rounded-2xl border border-white/10">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase">Faculty Mentor</p>
-                  <p className="text-xs font-black text-white mt-1">{viewStudentModal.mentor?.name || 'Not assigned'}</p>
+                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
+                  <p className="text-[10px] font-black text-slate-600 uppercase">Faculty Mentor</p>
+                  <p className="text-xs font-black text-slate-900 mt-1">{viewStudentModal.mentor?.name || 'Not assigned'}</p>
                 </div>
-                <div className="p-3.5 glass-card rounded-2xl border border-white/10">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase">Class Advisor</p>
-                  <p className="text-xs font-black text-white mt-1">{viewStudentModal.advisor?.name || 'Not assigned'}</p>
+                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
+                  <p className="text-[10px] font-black text-slate-600 uppercase">Class Advisor</p>
+                  <p className="text-xs font-black text-slate-900 mt-1">{viewStudentModal.advisor?.name || 'Not assigned'}</p>
                 </div>
               </div>
 
-              <div className="space-y-2 pt-2 border-t border-white/10">
-                <div className="flex items-center gap-2 text-slate-300">
+              <div className="space-y-2 pt-2 border-t border-slate-200 font-bold">
+                <div className="flex items-center gap-2 text-slate-800">
                   <Mail className="w-4 h-4 text-slate-500" />
                   <span>{viewStudentModal.email}</span>
                 </div>
                 {viewStudentModal.phone && (
-                  <div className="flex items-center gap-2 text-slate-300">
+                  <div className="flex items-center gap-2 text-slate-800">
                     <Phone className="w-4 h-4 text-slate-500" />
                     <span>{viewStudentModal.phone}</span>
                   </div>
@@ -956,10 +956,10 @@ export const StaffDashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex justify-end pt-2">
+            <div className="flex justify-end pt-2 border-t border-slate-200">
               <button
                 onClick={() => setViewStudentModal(null)}
-                className="px-5 py-2.5 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-xl cursor-pointer"
+                className="px-5 py-2.5 text-xs font-black text-white bg-slate-900 hover:bg-slate-800 rounded-xl cursor-pointer"
               >
                 Close Profile
               </button>
