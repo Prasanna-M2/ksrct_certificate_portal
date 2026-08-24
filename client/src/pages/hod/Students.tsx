@@ -19,7 +19,7 @@ export const HodStudents: React.FC = () => {
     try {
       setLoading(true);
       const res = await api.get('/users', {
-        params: { search, year },
+        params: { search, year, role: 'STUDENT', limit: 1000 },
       });
       if (res.data && res.data.success) {
         setStudents(res.data.users || []);

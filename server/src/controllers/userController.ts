@@ -192,10 +192,11 @@ export const getUsers = async (req: AuthenticatedRequest, res: Response) => {
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
 
-    const { role, year, section, search, mentorId, advisorId, page = '1', limit = '100' } = req.query;
+    const { role, year, section, search, mentorId, advisorId, scope, page = '1', limit = '1000' } = req.query;
     const userRole = req.user.role;
     const responsibilities = req.user.responsibilities || [];
     const userId = req.user.userId;
+    const userEmail = req.user.email?.toLowerCase() || '';
 
     const whereClause: any = {
       department: EEE_DEPT,
@@ -206,30 +207,23 @@ export const getUsers = async (req: AuthenticatedRequest, res: Response) => {
     if (userRole === 'STUDENT') {
       whereClause.id = userId;
     } 
-    // If Staff with ONLY MENTOR responsibility: see only assigned mentees
-    else if (userRole === 'STAFF' || userRole === 'MENTOR') {
-      const isHod = responsibilities.includes('HOD') || (userRole as string) === 'HOD';
+    // If Staff: check HOD vs Advisor vs Mentor scope
+    else if (userRole === 'STAFF' || userRole === 'MENTOR' || userRole === 'ADVISOR' || userRole === 'HOD') {
+      const isHod = responsibilities.includes('HOD') || (userRole as string) === 'HOD' || (userRole as string) === 'CREATOR' || (userRole as string) === 'ADMIN' || userEmail.includes('srividhya') || userEmail.includes('principal');
       const isAdvisor = responsibilities.includes('ADVISOR') || (userRole as string) === 'ADVISOR';
       const isMentor = responsibilities.includes('MENTOR') || (userRole as string) === 'MENTOR';
 
-      if (!isHod && !isAdvisor && isMentor) {
+      if (scope === 'MENTOR') {
         whereClause.mentorId = userId;
-      } else if (!isHod && isAdvisor && !isMentor) {
-        // Find assigned years
+      } else if (scope === 'ADVISOR') {
         const assignedYears = req.user.advisoryYears || [];
         whereClause.OR = [
-          { advisorId: userId },
-          { year: { in: assignedYears } },
-        ];
-      } else if (!isHod && isAdvisor && isMentor) {
-        const assignedYears = req.user.advisoryYears || [];
-        whereClause.OR = [
-          { mentorId: userId },
           { advisorId: userId },
           { year: { in: assignedYears } },
         ];
       }
-      // If HOD or Creator/Admin: can see all EEE students
+      // If HOD or in Student Monitoring Directory (default for staff portal):
+      // returns all EEE students!
     }
 
     if (role && typeof role === 'string' && role !== 'ALL') {
@@ -268,7 +262,7 @@ export const getUsers = async (req: AuthenticatedRequest, res: Response) => {
     }
 
     const pageNum = parseInt(page as string, 10) || 1;
-    const limitNum = parseInt(limit as string, 10) || 100;
+    const limitNum = limit === 'ALL' ? 1000 : (parseInt(limit as string, 10) || 1000);
     const skip = (pageNum - 1) * limitNum;
 
     const [users, total] = await Promise.all([

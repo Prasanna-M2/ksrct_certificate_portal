@@ -73,9 +73,9 @@ export const StaffDashboard: React.FC = () => {
       setLoading(true);
       const [dashRes, certsRes, odRes, studentsRes] = await Promise.all([
         api.get('/dashboard/staff'),
-        api.get('/certificates?limit=50'),
-        api.get('/od?limit=50'),
-        api.get('/users?limit=100'),
+        api.get('/certificates?limit=100'),
+        api.get('/od?limit=100'),
+        api.get('/users?limit=1000&role=STUDENT'),
       ]);
 
       if (dashRes.data?.success) {
