@@ -28,6 +28,7 @@ router.use(authenticate);
 // Student Profile / Available Selectors
 router.get('/structure', getEeeStructure);
 router.patch('/profile', updateProfile);
+router.put('/profile', updateProfile);
 
 // Staff & Student Lists
 router.get('/staff', authorize(['HOD', 'ADMIN', 'CREATOR', 'STAFF']), getStaff);

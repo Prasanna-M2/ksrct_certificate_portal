@@ -44,6 +44,14 @@ router.post(
   ]),
   resubmitCertificate
 );
+router.patch(
+  '/:id/resubmit',
+  uploadCertificateMiddleware.fields([
+    { name: 'file', maxCount: 1 },
+    { name: 'supportingFile', maxCount: 1 },
+  ]),
+  resubmitCertificate
+);
 
 // Workflow actions for approver roles
 router.post(
@@ -51,7 +59,17 @@ router.post(
   authorize(['MENTOR', 'ADVISOR', 'HOD', 'STAFF', 'ADMIN', 'CERTIFICATE_COORDINATOR']),
   approveCertificate
 );
+router.patch(
+  '/:id/approve',
+  authorize(['MENTOR', 'ADVISOR', 'HOD', 'STAFF', 'ADMIN', 'CERTIFICATE_COORDINATOR']),
+  approveCertificate
+);
 router.post(
+  '/:id/reject',
+  authorize(['MENTOR', 'ADVISOR', 'HOD', 'STAFF', 'ADMIN', 'CERTIFICATE_COORDINATOR']),
+  rejectCertificate
+);
+router.patch(
   '/:id/reject',
   authorize(['MENTOR', 'ADVISOR', 'HOD', 'STAFF', 'ADMIN', 'CERTIFICATE_COORDINATOR']),
   rejectCertificate

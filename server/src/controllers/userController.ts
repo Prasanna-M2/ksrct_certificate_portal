@@ -548,7 +548,7 @@ export const updateProfile = async (req: AuthenticatedRequest, res: Response) =>
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
 
-    const { name, phone, mentorId, advisorId, section, rollNumber } = req.body;
+    const { name, phone, mentorId, advisorId, year, section, rollNumber } = req.body;
     const currentUser = await prisma.user.findUnique({ where: { id: req.user.userId } });
 
     if (!currentUser) {
@@ -576,9 +576,10 @@ export const updateProfile = async (req: AuthenticatedRequest, res: Response) =>
     }
 
     // If student is selecting an advisor, verify advisor belongs to student's year
-    if (advisorId && currentUser.role === 'STUDENT' && currentUser.year) {
+    const targetYear = year || currentUser.year;
+    if (advisorId && currentUser.role === 'STUDENT' && targetYear) {
       const assignment = await prisma.advisorAssignment.findFirst({
-        where: { staffId: advisorId, year: currentUser.year, isActive: true },
+        where: { staffId: advisorId, year: targetYear, isActive: true },
       });
 
       if (!assignment) {
@@ -597,10 +598,11 @@ export const updateProfile = async (req: AuthenticatedRequest, res: Response) =>
       data: {
         ...(name ? { name } : {}),
         ...(phone !== undefined ? { phone } : {}),
-        ...(mentorId ? { mentorId } : {}),
-        ...(advisorId ? { advisorId } : {}),
+        ...(year ? { year } : {}),
         ...(section ? { section } : {}),
         ...(rollNumber ? { rollNumber } : {}),
+        ...(mentorId !== undefined ? { mentorId: mentorId || null } : {}),
+        ...(advisorId !== undefined ? { advisorId: advisorId || null } : {}),
       },
       include: {
         mentor: { select: { id: true, name: true, email: true } },
@@ -620,7 +622,7 @@ export const updateProfile = async (req: AuthenticatedRequest, res: Response) =>
       ipAddress: req.ip,
     });
 
-    const responsibilities = updatedUser.staffResponsibilities.map((r) => r.responsibility);
+    const responsibilities = updatedUser.staffResponsibilities ? updatedUser.staffResponsibilities.map((r) => r.responsibility) : [];
 
     return res.status(200).json({
       success: true,
@@ -641,7 +643,7 @@ export const updateProfile = async (req: AuthenticatedRequest, res: Response) =>
         advisorId: updatedUser.advisorId,
         advisor: updatedUser.advisor,
         responsibilities,
-        advisorAssignments: updatedUser.advisorAssignments,
+        advisorAssignments: updatedUser.advisorAssignments || [],
       },
     });
   } catch (error) {
