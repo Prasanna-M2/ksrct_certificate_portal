@@ -181,7 +181,11 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
         formData.append('odDate', editEventDate);
         formData.append('purpose', editPurpose);
         formData.append('description', editDescription);
-        if (newFile) formData.append('documentFile', newFile);
+        if (newFile) {
+          formData.append('supportingFile', newFile);
+          formData.append('documentFile', newFile);
+          formData.append('file', newFile);
+        }
       }
 
       const endpoint = isCert

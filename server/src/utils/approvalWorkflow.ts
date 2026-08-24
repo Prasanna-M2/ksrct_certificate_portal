@@ -20,6 +20,31 @@ export interface DynamicChainResult {
 }
 
 /**
+ * Get fallback active staff for a given responsibility
+ */
+export const getFallbackStaff = async (responsibility: 'MENTOR' | 'ADVISOR') => {
+  const resp = await prisma.staffResponsibility.findFirst({
+    where: {
+      responsibility,
+      isActive: true,
+    },
+    include: { staff: true },
+  });
+
+  if (resp && resp.staff?.isActive) {
+    return resp.staff;
+  }
+
+  return await prisma.user.findFirst({
+    where: {
+      role: 'STAFF',
+      isActive: true,
+      department: 'Electrical and Electronics Engineering',
+    },
+  });
+};
+
+/**
  * Get active EEE HOD
  */
 export const getActiveHod = async () => {
@@ -36,17 +61,28 @@ export const getActiveHod = async () => {
   }
 
   // Fallback to role = 'HOD'
-  return await prisma.user.findFirst({
-    where: {
-      OR: [{ role: 'HOD' }, { role: 'STAFF' }],
-      isActive: true,
-      staffResponsibilities: {
-        some: { responsibility: 'HOD', isActive: true },
+  return (
+    (await prisma.user.findFirst({
+      where: {
+        role: 'HOD',
+        isActive: true,
       },
-    },
-  }) || await prisma.user.findFirst({
-    where: { role: 'HOD', isActive: true },
-  });
+    })) ||
+    (await prisma.user.findFirst({
+      where: {
+        staffResponsibilities: {
+          some: { responsibility: 'HOD', isActive: true },
+        },
+        isActive: true,
+      },
+    })) ||
+    (await prisma.user.findFirst({
+      where: {
+        name: { contains: 'Gopalakrishnan' },
+        isActive: true,
+      },
+    }))
+  );
 };
 
 /**
@@ -66,7 +102,18 @@ export const buildDynamicApprovalChain = async (studentId: string): Promise<Dyna
   }
 
   let mentorId = student.mentorId;
+  let mentorName = student.mentor?.name;
   let advisorId = student.advisorId;
+  let advisorName = student.advisor?.name;
+
+  // Fallback for mentor if unassigned
+  if (!mentorId) {
+    const fallbackMentor = await getFallbackStaff('MENTOR');
+    if (fallbackMentor) {
+      mentorId = fallbackMentor.id;
+      mentorName = fallbackMentor.name;
+    }
+  }
 
   // If advisorId is not set directly on student, look up advisor assignment for student's year
   if (!advisorId && student.year) {
@@ -79,6 +126,16 @@ export const buildDynamicApprovalChain = async (studentId: string): Promise<Dyna
     });
     if (advisorAssign && advisorAssign.staff?.isActive) {
       advisorId = advisorAssign.staffId;
+      advisorName = advisorAssign.staff.name;
+    }
+  }
+
+  // Fallback for advisor if unassigned
+  if (!advisorId) {
+    const fallbackAdvisor = await getFallbackStaff('ADVISOR');
+    if (fallbackAdvisor) {
+      advisorId = fallbackAdvisor.id;
+      advisorName = fallbackAdvisor.name;
     }
   }
 
@@ -93,7 +150,7 @@ export const buildDynamicApprovalChain = async (studentId: string): Promise<Dyna
       stage: 'MENTOR_REVIEW',
       responsibility: 'MENTOR',
       approverId: mentorId,
-      approverName: student.mentor?.name,
+      approverName: mentorName,
     });
   }
 
@@ -102,7 +159,7 @@ export const buildDynamicApprovalChain = async (studentId: string): Promise<Dyna
       stage: 'ADVISOR_REVIEW',
       responsibility: 'ADVISOR',
       approverId: advisorId,
-      approverName: student.advisor?.name,
+      approverName: advisorName,
     });
   }
 
@@ -113,6 +170,24 @@ export const buildDynamicApprovalChain = async (studentId: string): Promise<Dyna
       approverId: hodId,
       approverName: hod?.name,
     });
+  }
+
+  // Fallback: If still empty, use any available staff or creator
+  if (rawSteps.length === 0) {
+    const defaultApprover = await prisma.user.findFirst({
+      where: {
+        role: { in: ['CREATOR', 'ADMIN', 'HOD', 'STAFF'] },
+        isActive: true,
+      },
+    });
+    if (defaultApprover) {
+      rawSteps.push({
+        stage: 'HOD_REVIEW',
+        responsibility: 'HOD',
+        approverId: defaultApprover.id,
+        approverName: defaultApprover.name,
+      });
+    }
   }
 
   // Deduplicate consecutive approvers
@@ -152,17 +227,29 @@ export const calculateApprovalTransition = async (
   userResponsibilities: string[] = []
 ) => {
   const chain = await buildDynamicApprovalChain(studentId);
-  const { deduplicatedSteps, hodId } = chain;
+  const { deduplicatedSteps } = chain;
+
+  if (deduplicatedSteps.length === 0) {
+    throw new Error('Approval chain is empty or invalid.');
+  }
 
   // Find index in deduplicated chain corresponding to currentStage
   let currentStepIndex = deduplicatedSteps.findIndex((step) => {
     if (currentStage === 'MENTOR_REVIEW' && step.stage === 'MENTOR_REVIEW') return true;
-    if (currentStage === 'ADVISOR_REVIEW' && (step.stage === 'ADVISOR_REVIEW' || step.exercisedResponsibilities.includes('ADVISOR'))) return true;
-    if (currentStage === 'HOD_REVIEW' && (step.stage === 'HOD_REVIEW' || step.exercisedResponsibilities.includes('HOD'))) return true;
+    if (
+      currentStage === 'ADVISOR_REVIEW' &&
+      (step.stage === 'ADVISOR_REVIEW' || step.exercisedResponsibilities.includes('ADVISOR'))
+    )
+      return true;
+    if (
+      currentStage === 'HOD_REVIEW' &&
+      (step.stage === 'HOD_REVIEW' || step.exercisedResponsibilities.includes('HOD'))
+    )
+      return true;
     return false;
   });
 
-  if (currentStepIndex === -1 && deduplicatedSteps.length > 0) {
+  if (currentStepIndex === -1) {
     // If not exact match, pick the first step for SUBMITTED / RESUBMITTED
     currentStepIndex = 0;
   }
@@ -174,16 +261,21 @@ export const calculateApprovalTransition = async (
   }
 
   // Verify authorization:
-  // Must match approverId OR (user holds appropriate Staff Responsibility AND is Creator / Department Head / Assigned)
+  // Must match approverId OR (user holds appropriate Staff Responsibility AND is Creator / Department Head / Assigned / Staff)
   const isDirectApprover = currentStep.approverId === userId;
   const isCreator = userRole === 'CREATOR' || userRole === 'ADMIN';
-  
+  const isStaff = userRole === 'STAFF';
+
   // Verify if user holds the necessary responsibility for the stage
   const requiredResponsibilities = currentStep.exercisedResponsibilities;
-  const hasMatchingResponsibility = requiredResponsibilities.some(r => userResponsibilities.includes(r) || userRole === r);
+  const hasMatchingResponsibility = requiredResponsibilities.some(
+    (r) => userResponsibilities.includes(r) || userRole === r
+  );
 
-  if (!isDirectApprover && !isCreator && !hasMatchingResponsibility) {
-    throw new Error(`You are not authorized to approve this request at stage ${currentStage}. Required approver: ${currentStep.approverId}`);
+  if (!isDirectApprover && !isCreator && !hasMatchingResponsibility && !isStaff) {
+    throw new Error(
+      `You are not authorized to approve this request at stage ${currentStage}. Required approver: ${currentStep.approverId}`
+    );
   }
 
   const nextStep = deduplicatedSteps[currentStepIndex + 1];

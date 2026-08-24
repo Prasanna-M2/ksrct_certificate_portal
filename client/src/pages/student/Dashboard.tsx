@@ -35,16 +35,21 @@ export const StudentDashboard: React.FC = () => {
       setLoading(true);
 
       const [certRes, odRes] = await Promise.all([
-        api.get('/certificates/my'),
-        api.get('/od/my'),
+        api.get('/certificates'),
+        api.get('/od'),
       ]);
 
-      const certs = certRes.data?.data || [];
-      const ods = odRes.data?.data || [];
+      const certs = certRes.data?.certificates || certRes.data?.data || [];
+      const ods = odRes.data?.odRequests || odRes.data?.data || [];
 
       // Calculate Certificate Stats
       const cPending = certs.filter(
-        (c: any) => c.status === 'SUBMITTED' || c.status === 'MENTOR_REVIEW' || c.status === 'ADVISOR_REVIEW' || c.status === 'HOD_REVIEW' || c.status === 'RESUBMITTED'
+        (c: any) =>
+          c.status === 'SUBMITTED' ||
+          c.status === 'MENTOR_REVIEW' ||
+          c.status === 'ADVISOR_REVIEW' ||
+          c.status === 'HOD_REVIEW' ||
+          c.status === 'RESUBMITTED'
       ).length;
       const cApproved = certs.filter((c: any) => c.status === 'APPROVED' || c.status === 'ISSUED').length;
       const cRejected = certs.filter((c: any) => c.status === 'REJECTED').length;
@@ -58,7 +63,12 @@ export const StudentDashboard: React.FC = () => {
 
       // Calculate OD Stats
       const odPending = ods.filter(
-        (o: any) => o.status === 'SUBMITTED' || o.status === 'MENTOR_REVIEW' || o.status === 'ADVISOR_REVIEW' || o.status === 'HOD_REVIEW' || o.status === 'RESUBMITTED'
+        (o: any) =>
+          o.status === 'SUBMITTED' ||
+          o.status === 'MENTOR_REVIEW' ||
+          o.status === 'ADVISOR_REVIEW' ||
+          o.status === 'HOD_REVIEW' ||
+          o.status === 'RESUBMITTED'
       ).length;
       const odApproved = ods.filter((o: any) => o.status === 'APPROVED').length;
       const odRejected = ods.filter((o: any) => o.status === 'REJECTED').length;
@@ -74,21 +84,21 @@ export const StudentDashboard: React.FC = () => {
       const combined = [
         ...certs.map((c: any) => ({
           id: c.id,
-          requestId: c.certificateNumber || `CERT-${c.id.substring(0, 8)}`,
+          requestId: c.certificateId || `CERT-${c.id.substring(0, 8)}`,
           title: c.title,
           type: 'CERTIFICATE' as const,
           categoryOrType: c.category || 'General',
-          submittedDate: c.createdAt,
+          submittedDate: c.uploadedAt || c.createdAt,
           currentStage: c.currentStage,
           status: c.status,
           originalItem: c,
         })),
         ...ods.map((o: any) => ({
           id: o.id,
-          requestId: o.odNumber || `OD-${o.id.substring(0, 8)}`,
-          title: o.eventName || `${o.reason || 'OD'} Application`,
+          requestId: o.odId || `OD-${o.id.substring(0, 8)}`,
+          title: o.eventName || `${o.purpose || 'OD'} Application`,
           type: 'OD' as const,
-          categoryOrType: o.category || 'Academic',
+          categoryOrType: o.eventType || o.requestType || 'On-Duty',
           submittedDate: o.createdAt,
           currentStage: o.currentStage,
           status: o.status,

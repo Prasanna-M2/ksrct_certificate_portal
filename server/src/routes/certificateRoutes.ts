@@ -23,6 +23,7 @@ router.get('/verify-code/:code', getVerificationByCode);
 router.use(authenticate);
 
 router.get('/', getCertificates);
+router.get('/my', getCertificates);
 router.post(
   '/',
   uploadCertificateMiddleware.fields([

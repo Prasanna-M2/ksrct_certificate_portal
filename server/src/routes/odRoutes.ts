@@ -3,6 +3,7 @@ import {
   createOdRequest,
   getOdRequests,
   getOdRequestById,
+  getOdFile,
   approveOdRequest,
   rejectOdRequest,
   resubmitOdRequest,
@@ -21,18 +22,27 @@ const storage = multer.diskStorage({
   },
 });
 const upload = multer({ storage });
+const flexibleUpload = upload.fields([
+  { name: 'supportingFile', maxCount: 1 },
+  { name: 'documentFile', maxCount: 1 },
+  { name: 'file', maxCount: 1 },
+]);
 
 const router = Router();
 
 router.use(authenticate);
 
-router.post('/', upload.single('supportingFile'), createOdRequest);
+router.post('/', flexibleUpload, createOdRequest);
 router.get('/', getOdRequests);
+router.get('/my', getOdRequests);
 router.get('/:id', getOdRequestById);
+router.get('/:id/file', getOdFile);
 router.delete('/:id', deleteOdRequest);
 
-// Resubmit route for students
-router.post('/:id/resubmit', upload.single('supportingFile'), resubmitOdRequest);
+// Resubmit route for students (Supports POST, PUT, PATCH)
+router.post('/:id/resubmit', flexibleUpload, resubmitOdRequest);
+router.put('/:id/resubmit', flexibleUpload, resubmitOdRequest);
+router.patch('/:id/resubmit', flexibleUpload, resubmitOdRequest);
 
 // Workflow actions for approver roles (Supports both POST & PATCH for flexibility)
 router.post(

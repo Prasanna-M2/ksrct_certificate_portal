@@ -15,10 +15,18 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: 'Please provide email and password.' });
     }
 
-    const normalizedEmail = email.trim().toLowerCase();
+    const rawInput = email.trim();
+    const normalizedEmail = rawInput.toLowerCase();
 
-    let user = await prisma.user.findUnique({
-      where: { email: normalizedEmail },
+    let user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: normalizedEmail },
+          { registerNumber: rawInput },
+          { rollNumber: rawInput },
+          { email: rawInput },
+        ],
+      },
       include: {
         staffResponsibilities: {
           where: { isActive: true },

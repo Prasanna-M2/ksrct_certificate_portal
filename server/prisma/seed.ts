@@ -284,12 +284,22 @@ async function main() {
   const defaultStaffPasswordHash = await bcrypt.hash('Staff@123', 10);
 
   for (const faculty of facultyMembers) {
-    await prisma.user.create({
+    const isHod = faculty.name.includes('Gopalakrishnan') || faculty.email.includes('gopalakrishnan');
+    const advisoryYear = faculty.name.includes('SriVidhya')
+      ? 'II'
+      : faculty.name.includes('Vijayagowri')
+      ? 'III'
+      : faculty.name.includes('Aravindan')
+      ? 'IV'
+      : null;
+    const role = isHod ? 'HOD' : 'STAFF';
+
+    const createdFaculty = await prisma.user.create({
       data: {
         name: faculty.name,
         email: faculty.email,
         passwordHash: defaultStaffPasswordHash,
-        role: 'STAFF',
+        role,
         department: EEE_DEPT,
         phone: faculty.phone,
         rollNumber: (faculty as any).rollNumber || null,
@@ -297,11 +307,52 @@ async function main() {
         isActive: true,
       },
     });
+
+    if (isHod) {
+      await prisma.staffResponsibility.create({
+        data: {
+          staffId: createdFaculty.id,
+          responsibility: 'HOD',
+          department: EEE_DEPT,
+          isActive: true,
+        },
+      });
+    } else {
+      await prisma.staffResponsibility.create({
+        data: {
+          staffId: createdFaculty.id,
+          responsibility: 'ADVISOR',
+          department: EEE_DEPT,
+          isActive: true,
+        },
+      });
+
+      await prisma.staffResponsibility.create({
+        data: {
+          staffId: createdFaculty.id,
+          responsibility: 'MENTOR',
+          department: EEE_DEPT,
+          isActive: true,
+        },
+      });
+
+      if (advisoryYear) {
+        await prisma.advisorAssignment.create({
+          data: {
+            staffId: createdFaculty.id,
+            department: EEE_DEPT,
+            year: advisoryYear,
+            section: 'A',
+            isActive: true,
+          },
+        });
+      }
+    }
   }
 
-  console.log(`✨ Added ${facultyMembers.length} official EEE faculty members.`);
+  console.log(`✨ Added ${facultyMembers.length} official EEE faculty members with Responsibilities & Advisory.`);
 
-  // 4. Create Students (II Year, III Year, IV Year)
+  // 4. Create Students (II Year, III Year, IV Year) - Mentors & Advisors chosen by students
   const defaultStudentPasswordHash = await bcrypt.hash('Student@123', 10);
 
   // (2025-29 Batch) – II Year
@@ -319,6 +370,9 @@ async function main() {
         stayType: 'DAY_SCHOLAR',
         registerNumber: st.regNo,
         rollNumber: st.regNo,
+        mentorId: null,
+        advisorId: null,
+        isAccountSetup: true,
         isActive: true,
       },
     });
@@ -339,6 +393,9 @@ async function main() {
         stayType: 'DAY_SCHOLAR',
         registerNumber: st.regNo,
         rollNumber: st.regNo,
+        mentorId: null,
+        advisorId: null,
+        isAccountSetup: true,
         isActive: true,
       },
     });
@@ -359,6 +416,9 @@ async function main() {
         stayType: 'DAY_SCHOLAR',
         registerNumber: st.regNo,
         rollNumber: st.regNo,
+        mentorId: null,
+        advisorId: null,
+        isAccountSetup: true,
         isActive: true,
       },
     });

@@ -7,7 +7,7 @@ import { logAudit } from '../utils/auditLogger';
 const EEE_DEPT = 'Electrical and Electronics Engineering';
 
 /**
- * Get available EEE Mentors with their capacity
+ * Get available EEE Mentors with their capacity (excluding HOD)
  */
 export const getAvailableMentors = async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -15,11 +15,12 @@ export const getAvailableMentors = async (req: AuthenticatedRequest, res: Respon
       where: {
         department: EEE_DEPT,
         isActive: true,
+        role: { not: 'HOD' },
+        name: { not: { contains: 'Gopalakrishnan' } },
         OR: [
           { role: 'STAFF' },
           { role: 'MENTOR' },
           { role: 'ADVISOR' },
-          { role: 'HOD' },
           { staffResponsibilities: { some: { responsibility: 'MENTOR', isActive: true } } },
         ],
       },
@@ -54,38 +55,21 @@ export const getAvailableMentors = async (req: AuthenticatedRequest, res: Respon
 };
 
 /**
- * Get available EEE Advisors, optionally filtered by Year
+ * Get available EEE Advisors (All active faculty members)
  */
 export const getAvailableAdvisors = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { year } = req.query;
-
-    let whereClause: any = {
-      department: EEE_DEPT,
-      isActive: true,
-      OR: [
-        { role: 'STAFF' },
-        { role: 'ADVISOR' },
-        { role: 'HOD' },
-        { staffResponsibilities: { some: { responsibility: 'ADVISOR', isActive: true } } },
-      ],
-    };
-
-    if (year && typeof year === 'string' && year !== 'ALL') {
-      // Find staff who have AdvisorAssignment for this year
-      const assignments = await prisma.advisorAssignment.findMany({
-        where: { year, isActive: true },
-        select: { staffId: true },
-      });
-      const staffIds = assignments.map((a) => a.staffId);
-
-      if (staffIds.length > 0) {
-        whereClause.id = { in: staffIds };
-      }
-    }
-
     const advisors = await prisma.user.findMany({
-      where: whereClause,
+      where: {
+        department: EEE_DEPT,
+        isActive: true,
+        OR: [
+          { role: 'STAFF' },
+          { role: 'ADVISOR' },
+          { role: 'MENTOR' },
+          { staffResponsibilities: { some: { isActive: true } } },
+        ],
+      },
       select: {
         id: true,
         name: true,

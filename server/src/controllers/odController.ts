@@ -1,8 +1,10 @@
 import { Response } from 'express';
+import path from 'path';
+import fs from 'fs';
 import { prisma } from '../utils/prisma';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { logAudit } from '../utils/auditLogger';
-import { calculateApprovalTransition } from '../utils/approvalWorkflow';
+import { calculateApprovalTransition, getFallbackStaff } from '../utils/approvalWorkflow';
 
 const EEE_DEPT = 'Electrical and Electronics Engineering';
 
@@ -660,6 +662,41 @@ export const deleteOdRequest = async (req: AuthenticatedRequest, res: Response) 
   } catch (error) {
     console.error('Delete OD error:', error);
     return res.status(500).json({ success: false, message: 'Failed to delete OD request.' });
+  }
+};
+
+export const getOdFile = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
+    const { id } = req.params;
+    const odRequest = await prisma.odRequest.findFirst({
+      where: { OR: [{ id }, { odId: id }] },
+      include: { student: true },
+    });
+
+    if (!odRequest) {
+      return res.status(404).json({ success: false, message: 'OD request not found.' });
+    }
+
+    const filePathRaw = odRequest.attachmentPath || odRequest.supportingFile;
+    if (!filePathRaw) {
+      return res.status(404).json({ success: false, message: 'No file attachment found for this OD request.' });
+    }
+
+    const fileName = path.basename(filePathRaw);
+    const resolvedPath = path.join(__dirname, '../../../uploads/certificates', fileName);
+
+    if (!fs.existsSync(resolvedPath)) {
+      return res.status(404).json({ success: false, message: 'Physical file not found on server.' });
+    }
+
+    return res.sendFile(resolvedPath);
+  } catch (error) {
+    console.error('Get OD file error:', error);
+    return res.status(500).json({ success: false, message: 'Failed to retrieve OD file.' });
   }
 };
 

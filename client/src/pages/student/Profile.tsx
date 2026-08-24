@@ -42,14 +42,14 @@ export const Profile: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Fetch mentors with capacity & year-restricted advisors for students
-  const fetchFaculty = async (currentYear: string) => {
+  // Fetch mentors with capacity & advisors for students
+  const fetchFaculty = async () => {
     if (!isStudent) return;
     try {
       setLoadingFaculty(true);
       const [mentorRes, advisorRes] = await Promise.all([
         api.get('/users/mentors'),
-        api.get(`/users/advisors?year=${currentYear}`),
+        api.get('/users/advisors'),
       ]);
 
       if (mentorRes.data?.success) {
@@ -67,9 +67,9 @@ export const Profile: React.FC = () => {
 
   useEffect(() => {
     if (isStudent) {
-      fetchFaculty(year);
+      fetchFaculty();
     }
-  }, [year, isStudent]);
+  }, [isStudent]);
 
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -335,17 +335,17 @@ export const Profile: React.FC = () => {
                   {/* Class Advisor */}
                   <div className="space-y-1.5">
                     <label className="block text-xs font-black text-slate-900 uppercase">
-                      Class Advisor (Year {year} EEE)
+                      Class Advisor
                     </label>
                     <select
                       value={advisorId}
                       onChange={(e) => setAdvisorId(e.target.value)}
                       className="w-full p-3 text-xs font-bold rounded-xl border-2 border-slate-300 bg-white text-slate-900 cursor-pointer focus:border-[#f37021]"
                     >
-                      <option value="">Choose Year {year} Advisor...</option>
+                      <option value="">Choose Class Advisor...</option>
                       {advisors.map((a) => (
                         <option key={a.id} value={a.id}>
-                          {a.name} (Year {year}) {user?.advisor?.id === a.id ? '★ Current' : ''}
+                          {a.name} {user?.advisor?.id === a.id ? '★ Current' : ''}
                         </option>
                       ))}
                     </select>

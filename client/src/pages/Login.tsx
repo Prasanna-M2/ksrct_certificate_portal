@@ -87,7 +87,7 @@ export const Login: React.FC = () => {
         })
         .catch(() => {});
 
-      api.get(`/users/advisors?year=${regYear}`)
+      api.get('/users/advisors')
         .then((res) => {
           if (res.data?.success) {
             setAvailableAdvisors(res.data.advisors || []);
@@ -95,7 +95,7 @@ export const Login: React.FC = () => {
         })
         .catch(() => {});
     }
-  }, [authMode, regYear]);
+  }, [authMode]);
 
   // Check Register Number in Department Database
   const handleCheckRegisterNumber = async (regToSearch?: string) => {
@@ -427,15 +427,15 @@ export const Login: React.FC = () => {
                 <form onSubmit={handleLoginSubmit} className="space-y-4">
                   <div className="space-y-1.5">
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide">
-                      Email Address
+                      Institutional Email or Register Number *
                     </label>
                     <div className="relative">
                       <Mail className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
                       <input
-                        type="email"
+                        type="text"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="institutional.email@ksrct.ac.in"
+                        placeholder="e.g. 2403737710521034 or institutional email"
                         className="w-full pl-10 pr-3.5 py-3 text-xs font-semibold rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:bg-white focus:border-[#0a4c95] focus:ring-2 focus:ring-[#0a4c95]/10 outline-none transition-all placeholder:text-slate-400"
                         required
                         autoFocus
