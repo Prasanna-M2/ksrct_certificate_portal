@@ -516,7 +516,7 @@ export const Login: React.FC = () => {
                           type="text"
                           value={regNumber}
                           onChange={(e) => {
-                            setRegNumber(e.target.value.trim().toUpperCase());
+                            setRegNumber(e.target.value);
                             setRegStatus('IDLE');
                           }}
                           onKeyDown={(e) => {
