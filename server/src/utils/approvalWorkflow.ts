@@ -261,10 +261,9 @@ export const calculateApprovalTransition = async (
   }
 
   // Verify authorization:
-  // Must match approverId OR (user holds appropriate Staff Responsibility AND is Creator / Department Head / Assigned / Staff)
+  // Must match approverId OR be Creator/Admin OR hold the required responsibility for this stage
   const isDirectApprover = currentStep.approverId === userId;
   const isCreator = userRole === 'CREATOR' || userRole === 'ADMIN';
-  const isStaff = userRole === 'STAFF';
 
   // Verify if user holds the necessary responsibility for the stage
   const requiredResponsibilities = currentStep.exercisedResponsibilities;
@@ -272,7 +271,7 @@ export const calculateApprovalTransition = async (
     (r) => userResponsibilities.includes(r) || userRole === r
   );
 
-  if (!isDirectApprover && !isCreator && !hasMatchingResponsibility && !isStaff) {
+  if (!isDirectApprover && !isCreator && !hasMatchingResponsibility) {
     throw new Error(
       `You are not authorized to approve this request at stage ${currentStage}. Required approver: ${currentStep.approverId}`
     );

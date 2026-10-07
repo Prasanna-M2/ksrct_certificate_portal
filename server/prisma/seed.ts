@@ -243,6 +243,14 @@ async function main() {
     fs.mkdirSync(uploadDir, { recursive: true });
   }
 
+  // Check if database already has user records to prevent accidental wipe of changed passwords
+  const existingUserCount = await prisma.user.count();
+  if (existingUserCount > 0 && process.env.FORCE_SEED !== 'true') {
+    console.log(`ℹ️ Database already has ${existingUserCount} users. Skipping destructive wipe to preserve passwords and data.`);
+    console.log(`💡 To force a complete reset, run with FORCE_SEED=true`);
+    return;
+  }
+
   // Purge all existing data in foreign key safe order
   await prisma.approval.deleteMany();
   await prisma.auditLog.deleteMany();
@@ -288,10 +296,10 @@ async function main() {
     const advisoryYear = faculty.name.includes('SriVidhya')
       ? 'II'
       : faculty.name.includes('Vijayagowri')
-      ? 'III'
-      : faculty.name.includes('Aravindan')
-      ? 'IV'
-      : null;
+        ? 'III'
+        : faculty.name.includes('Aravindan')
+          ? 'IV'
+          : null;
     const role = isHod ? 'HOD' : 'STAFF';
 
     const createdFaculty = await prisma.user.create({

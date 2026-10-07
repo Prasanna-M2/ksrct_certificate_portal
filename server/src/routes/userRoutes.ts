@@ -11,6 +11,7 @@ import {
   assignYearAdvisors,
   assignStudentMentorAdvisor,
   updateProfile,
+  changePassword,
   assignMentor,
   updateUserRole,
   deleteUser,
@@ -25,10 +26,11 @@ router.get('/advisors', getAvailableAdvisors);
 
 router.use(authenticate);
 
-// Student Profile / Available Selectors
+// Student Profile / Available Selectors & Password Change
 router.get('/structure', getEeeStructure);
 router.patch('/profile', updateProfile);
 router.put('/profile', updateProfile);
+router.post('/change-password', changePassword);
 
 // Staff & Student Lists
 router.get('/staff', authorize(['HOD', 'ADMIN', 'CREATOR', 'STAFF']), getStaff);

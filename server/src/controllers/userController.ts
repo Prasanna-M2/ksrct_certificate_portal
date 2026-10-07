@@ -841,3 +841,61 @@ export const deleteUser = async (req: AuthenticatedRequest, res: Response) => {
     return res.status(500).json({ success: false, message: 'Failed to delete user.' });
   }
 };
+
+/**
+ * Change Password for Authenticated User
+ */
+export const changePassword = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Not authenticated.' });
+    }
+
+    const { currentPassword, newPassword } = req.body;
+
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ success: false, message: 'New password must be at least 6 characters.' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.userId },
+    });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+
+    if (currentPassword) {
+      const isMatch = await bcrypt.compare(currentPassword, user.passwordHash);
+      if (!isMatch) {
+        return res.status(400).json({ success: false, message: 'Current password does not match.' });
+      }
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { passwordHash, isAccountSetup: true },
+    });
+
+    await logAudit({
+      userId: user.id,
+      userName: user.name,
+      action: 'PASSWORD_CHANGED',
+      entityType: 'User',
+      entityId: user.id,
+      description: `User ${user.email} successfully updated their password.`,
+      ipAddress: req.ip,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password updated successfully.',
+    });
+  } catch (error) {
+    console.error('Change password error:', error);
+    return res.status(500).json({ success: false, message: 'Failed to update password.' });
+  }
+};
+

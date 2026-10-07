@@ -29,6 +29,8 @@ Thumbs.db
 .idea/
 *.log
 
-# Scratch files
+# Scratch & Test Artifacts
 scratch/
 server/scratch_test.js
+playwright-report/
+test-results/
