@@ -13,7 +13,7 @@
 
   html,
   body {
-    @apply text-slate-900 font-sans antialiased min-h-screen selection:bg-[#f37021] selection:text-white overflow-x-hidden font-semibold;
+    @apply text-slate-700 font-sans antialiased min-h-screen selection:bg-[#f37021] selection:text-white overflow-x-hidden font-normal;
     margin: 0;
     padding: 0;
     width: 100%;

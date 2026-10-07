@@ -103,10 +103,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             <img src="/assets/ksrct-logo.png" alt="KSRCT Logo" className="h-8 w-auto object-contain" />
           </div>
           <div>
-            <h2 className="text-xs font-black tracking-tight text-[#0a4c95] leading-tight uppercase flex items-center gap-1">
+            <h2 className="text-xs font-semibold tracking-tight text-[#0a4c95] leading-tight uppercase flex items-center gap-1">
               <span>KSRCT EEE</span>
             </h2>
-            <p className="text-[10px] text-[#f37021] font-black tracking-wider uppercase truncate max-w-[130px]">
+            <p className="text-[10px] text-[#f37021] font-medium tracking-wide uppercase truncate max-w-[130px]">
               {roleLabel}
             </p>
           </div>
@@ -124,12 +124,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
       {/* User Account Info Banner */}
       <div className="mx-3.5 my-3.5 p-3 rounded-2xl bg-slate-50/90 backdrop-blur-md border border-slate-200/90 flex items-center gap-3 shadow-xs">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#f37021] to-[#ff8c3b] text-white flex items-center justify-center font-black text-sm shadow-xs flex-shrink-0">
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#f37021] to-[#ff8c3b] text-white flex items-center justify-center font-semibold text-sm shadow-xs flex-shrink-0">
           {user?.name?.charAt(0) || 'U'}
         </div>
         <div className="min-w-0">
-          <p className="text-xs font-bold text-slate-900 truncate">{user?.name}</p>
-          <p className="text-[10px] text-[#0a4c95] font-semibold truncate mt-0.5">
+          <p className="text-xs font-medium text-slate-800 truncate">{user?.name}</p>
+          <p className="text-[10px] text-slate-500 font-normal truncate mt-0.5">
             {user?.role === 'STUDENT'
               ? `Reg: ${user?.registerNumber || 'N/A'}`
               : 'Electrical & Electronics Engg'}
@@ -138,7 +138,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex-1 px-3 py-2 space-y-1.5 overflow-y-auto">
+      <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -147,10 +147,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               to={item.to}
               onClick={onClose}
               className={({ isActive }) =>
-                `flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300 ${
+                `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all duration-200 ${
                   isActive
-                    ? 'bg-gradient-to-r from-[#f37021] to-[#e05e0e] text-white shadow-md font-extrabold translate-x-1 border border-white/30'
-                    : 'text-slate-800 font-extrabold hover:bg-slate-100 hover:text-[#0a4c95] hover:translate-x-0.5'
+                    ? 'bg-gradient-to-r from-[#f37021] to-[#e05e0e] text-white shadow-xs font-medium'
+                    : 'text-slate-600 font-normal hover:bg-slate-100 hover:text-[#0a4c95]'
                 }`
               }
             >
@@ -159,7 +159,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 <span>{item.label}</span>
               </div>
               {item.badge !== undefined && item.badge > 0 ? (
-                <span className="px-2 py-0.5 text-[10px] font-black bg-[#f37021] text-white rounded-full shadow-xs">
+                <span className="px-2 py-0.5 text-[10px] font-medium bg-[#f37021] text-white rounded-full shadow-xs">
                   {item.badge}
                 </span>
               ) : null}
@@ -172,7 +172,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       <div className="p-4 border-t border-slate-100">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition-colors cursor-pointer"
+          className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition-colors cursor-pointer"
         >
           <LogOut className="w-4 h-4" />
           <span>Sign Out</span>

@@ -53,11 +53,11 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar, title }) => {
               />
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-xs font-black tracking-tight text-[#0a4c95] leading-none uppercase flex items-center gap-1.5">
+              <h1 className="text-xs font-semibold tracking-tight text-[#0a4c95] leading-none uppercase flex items-center gap-1.5">
                 <span>K.S. Rangasamy</span>
-                <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-[#f37021]/15 text-[#f37021] border border-[#f37021]/30">AUTONOMOUS</span>
+                <span className="text-[9px] font-medium px-1.5 py-0.5 rounded bg-[#f37021]/10 text-[#f37021] border border-[#f37021]/20">AUTONOMOUS</span>
               </h1>
-              <p className="text-[10px] text-[#f37021] font-extrabold uppercase mt-0.5 tracking-wider flex items-center gap-1.5">
+              <p className="text-[10px] text-slate-500 font-normal uppercase mt-0.5 tracking-wider flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-xs" />
                 <span>Department of EEE &bull; Tiruchengode</span>
               </p>
@@ -66,7 +66,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar, title }) => {
 
           {title && (
             <div className="hidden md:flex items-center gap-2 pl-4 ml-2 border-l border-slate-200">
-              <span className="text-xs font-bold text-slate-700">{title}</span>
+              <span className="text-xs font-medium text-slate-600">{title}</span>
             </div>
           )}
         </div>

@@ -113,24 +113,24 @@ export const Profile: React.FC = () => {
       {/* Top Cards for Students ONLY */}
       {isStudent && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs flex items-center justify-between">
             <div className="space-y-0.5">
-              <span className="text-[10px] font-black text-slate-700 uppercase tracking-wider">Assigned Faculty Mentor</span>
-              <p className="text-sm font-black text-[#0a4c95]">{user?.mentor?.name || 'Not Selected'}</p>
-              <p className="text-xs text-slate-700 font-bold">{user?.mentor?.email || 'Choose your mentor below'}</p>
+              <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Assigned Faculty Mentor</span>
+              <p className="text-sm font-semibold text-[#0a4c95]">{user?.mentor?.name || 'Not Selected'}</p>
+              <p className="text-xs text-slate-500 font-normal">{user?.mentor?.email || 'Choose your mentor below'}</p>
             </div>
-            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#0a4c95] border border-blue-200 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#0a4c95] border border-blue-100 flex items-center justify-center">
               <Users className="w-6 h-6" />
             </div>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs flex items-center justify-between">
             <div className="space-y-0.5">
-              <span className="text-[10px] font-black text-slate-700 uppercase tracking-wider">Assigned Class Advisor</span>
-              <p className="text-sm font-black text-[#f37021]">{user?.advisor?.name || 'Not Selected'}</p>
-              <p className="text-xs text-slate-700 font-bold">{user?.advisor?.email || 'Year advisor'}</p>
+              <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Assigned Class Advisor</span>
+              <p className="text-sm font-semibold text-[#f37021]">{user?.advisor?.name || 'Not Selected'}</p>
+              <p className="text-xs text-slate-500 font-normal">{user?.advisor?.email || 'Year advisor'}</p>
             </div>
-            <div className="w-12 h-12 rounded-2xl bg-orange-50 text-[#f37021] border border-orange-200 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-2xl bg-orange-50 text-[#f37021] border border-orange-100 flex items-center justify-center">
               <GraduationCap className="w-6 h-6" />
             </div>
           </div>
@@ -141,11 +141,11 @@ export const Profile: React.FC = () => {
       {!isStudent && (
         <div className="p-6 rounded-3xl bg-gradient-to-r from-[#0a4c95] to-[#1e3a8a] text-white shadow-md flex items-center justify-between">
           <div className="space-y-1">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-orange-500 text-white uppercase tracking-wider shadow-xs">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-orange-500 text-white uppercase tracking-wider shadow-xs">
               <Shield className="w-3.5 h-3.5" /> System Authority Overview
             </span>
-            <h2 className="text-xl font-black tracking-tight text-white">{user?.name}</h2>
-            <p className="text-xs font-bold text-sky-200">
+            <h2 className="text-xl font-semibold tracking-tight text-white">{user?.name}</h2>
+            <p className="text-xs font-normal text-sky-200">
               Department of Electrical & Electronics Engineering &bull; {user?.role === 'CREATOR' ? 'Master Creator / Portal Administrator' : user?.role}
             </p>
           </div>
@@ -158,35 +158,35 @@ export const Profile: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Side: Avatar Card (4 Cols) */}
         <div className="lg:col-span-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-xs text-center flex flex-col items-center justify-center space-y-4">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-[#f37021] to-[#ff8c3b] text-white flex items-center justify-center text-3xl font-black shadow-md">
+          <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-[#f37021] to-[#ff8c3b] text-white flex items-center justify-center text-3xl font-bold shadow-md">
             {user?.name?.charAt(0).toUpperCase()}
           </div>
           <div>
-            <h2 className="text-base font-black text-slate-900">{user?.name}</h2>
+            <h2 className="text-base font-semibold text-slate-800">{user?.name}</h2>
             {isStudent && (
-              <p className="text-xs font-mono font-black text-[#f37021] mt-0.5">Reg No: {user?.registerNumber || 'N/A'}</p>
+              <p className="text-xs font-mono font-medium text-[#f37021] mt-0.5">Reg No: {user?.registerNumber || 'N/A'}</p>
             )}
             <div className="pt-2 flex flex-wrap justify-center gap-1.5">
-              <span className="inline-block px-3 py-1 text-[11px] font-black bg-orange-100 text-orange-950 rounded-full border border-orange-300 uppercase tracking-wider shadow-xs">
+              <span className="inline-block px-3 py-1 text-[11px] font-medium bg-orange-50 text-orange-800 rounded-full border border-orange-200 uppercase tracking-wider shadow-xs">
                 {isStudent ? (user?.year ? `Year ${user.year} EEE` : 'Student') : user?.role}
               </span>
               {responsibilities.map((r) => (
-                <span key={r} className="inline-block px-2.5 py-0.5 text-[10px] font-black bg-blue-100 text-blue-950 rounded-full border border-blue-300 uppercase">
+                <span key={r} className="inline-block px-2.5 py-0.5 text-[10px] font-medium bg-blue-50 text-blue-800 rounded-full border border-blue-200 uppercase">
                   {r}
                 </span>
               ))}
             </div>
           </div>
 
-          <div className="w-full pt-3 border-t border-slate-200 text-left space-y-2 text-xs font-bold text-slate-900">
-            <div className="flex items-center justify-between">
-              <span className="text-slate-700 font-extrabold">Department:</span>
-              <span className="font-black text-[#0a4c95]">{department}</span>
+          <div className="w-full pt-3 border-t border-slate-100 text-left space-y-2 text-xs">
+            <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
+              <span className="text-slate-500 font-medium text-[11px]">Department:</span>
+              <span className="font-medium text-[#0a4c95] text-xs text-right">{department}</span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-slate-700 font-extrabold">Status:</span>
-              <span className="font-black text-emerald-700 flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Active Account
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-slate-500 font-medium text-[11px]">Status:</span>
+              <span className="font-medium text-emerald-600 flex items-center gap-1 text-xs">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> Active Account
               </span>
             </div>
           </div>
@@ -194,13 +194,13 @@ export const Profile: React.FC = () => {
 
         {/* Right Side: Form (8 Cols) */}
         <div className="lg:col-span-8 bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-xs space-y-6">
-          <div className="flex items-center gap-2 text-xs font-black text-[#0a4c95] uppercase tracking-wider">
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#0a4c95] uppercase tracking-wider">
             <Edit3 className="w-4 h-4 text-[#0a4c95]" />
             <span>Profile Details & Account Information</span>
           </div>
 
           {errorMsg && (
-            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs font-bold text-rose-800">
+            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs font-medium text-rose-800">
               {errorMsg}
             </div>
           )}
@@ -209,14 +209,14 @@ export const Profile: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Full Name */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-black text-slate-900 uppercase">Full Name *</label>
+                <label className="block text-xs font-medium text-slate-700 uppercase">Full Name *</label>
                 <div className="relative">
-                  <User className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-500" />
+                  <User className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full pl-10 pr-3.5 py-3 text-xs font-bold rounded-xl border-2 border-slate-300 bg-white text-slate-900 focus:outline-none focus:border-[#f37021]"
+                    className="w-full pl-10 pr-3.5 py-2.5 text-xs font-normal rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-none focus:border-[#f37021] focus:ring-1 focus:ring-[#f37021]"
                     required
                   />
                 </div>
@@ -224,29 +224,29 @@ export const Profile: React.FC = () => {
 
               {/* Email (Readonly) */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-black text-slate-900 uppercase">Institutional Email</label>
+                <label className="block text-xs font-medium text-slate-700 uppercase">Institutional Email</label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-500" />
+                  <Mail className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
                   <input
                     type="email"
                     value={email}
                     disabled
-                    className="w-full pl-10 pr-3.5 py-3 text-xs font-bold rounded-xl border-2 border-slate-300 bg-slate-100 text-slate-900 opacity-100 cursor-not-allowed"
+                    className="w-full pl-10 pr-3.5 py-2.5 text-xs font-normal rounded-xl border border-slate-200 bg-slate-50 text-slate-600 opacity-100 cursor-not-allowed"
                   />
                 </div>
               </div>
 
               {/* Phone */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-black text-slate-900 uppercase">Phone Number</label>
+                <label className="block text-xs font-medium text-slate-700 uppercase">Phone Number</label>
                 <div className="relative">
-                  <Phone className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-500" />
+                  <Phone className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
                   <input
                     type="text"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+91 98765 43210"
-                    className="w-full pl-10 pr-3.5 py-3 text-xs font-bold rounded-xl border-2 border-slate-300 bg-white text-slate-900 focus:outline-none focus:border-[#f37021]"
+                    className="w-full pl-10 pr-3.5 py-2.5 text-xs font-normal rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-none focus:border-[#f37021] focus:ring-1 focus:ring-[#f37021]"
                   />
                 </div>
               </div>
@@ -256,22 +256,22 @@ export const Profile: React.FC = () => {
                 <>
                   {/* Register Number */}
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-black text-slate-900 uppercase">Register Number</label>
+                    <label className="block text-xs font-medium text-slate-700 uppercase">Register Number</label>
                     <input
                       type="text"
                       value={registerNumber}
                       disabled
-                      className="w-full p-3 text-xs font-mono font-black rounded-xl border-2 border-slate-300 bg-slate-100 text-slate-900 opacity-100 cursor-not-allowed"
+                      className="w-full p-2.5 text-xs font-mono font-normal rounded-xl border border-slate-200 bg-slate-50 text-slate-600 opacity-100 cursor-not-allowed"
                     />
                   </div>
 
                   {/* Year */}
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-black text-slate-900 uppercase">Academic Year</label>
+                    <label className="block text-xs font-medium text-slate-700 uppercase">Academic Year</label>
                     <select
                       value={year}
                       onChange={(e) => setYear(e.target.value)}
-                      className="w-full p-3 text-xs font-bold rounded-xl border-2 border-slate-300 bg-white text-slate-900 cursor-pointer focus:border-[#f37021]"
+                      className="w-full p-2.5 text-xs font-normal rounded-xl border border-slate-200 bg-white text-slate-800 cursor-pointer focus:border-[#f37021] focus:ring-1 focus:ring-[#f37021]"
                     >
                       <option value="I">1st Year (I)</option>
                       <option value="II">2nd Year (II)</option>
@@ -282,11 +282,11 @@ export const Profile: React.FC = () => {
 
                   {/* Section */}
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-black text-slate-900 uppercase">Section</label>
+                    <label className="block text-xs font-medium text-slate-700 uppercase">Section</label>
                     <select
                       value={section}
                       onChange={(e) => setSection(e.target.value)}
-                      className="w-full p-3 text-xs font-bold rounded-xl border-2 border-slate-300 bg-white text-slate-900 cursor-pointer focus:border-[#f37021]"
+                      className="w-full p-2.5 text-xs font-normal rounded-xl border border-slate-200 bg-white text-slate-800 cursor-pointer focus:border-[#f37021] focus:ring-1 focus:ring-[#f37021]"
                     >
                       <option value="A">Section A</option>
                       <option value="B">Section B</option>
@@ -299,21 +299,21 @@ export const Profile: React.FC = () => {
 
             {/* Student Faculty Selection ONLY */}
             {isStudent && (
-              <div className="pt-4 border-t border-slate-200 space-y-4">
-                <h3 className="text-xs font-black text-[#0a4c95] uppercase tracking-wider">
+              <div className="pt-4 border-t border-slate-100 space-y-4">
+                <h3 className="text-xs font-semibold text-[#0a4c95] uppercase tracking-wider">
                   Support Faculty Assignment
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Faculty Mentor */}
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-black text-slate-900 uppercase">
+                    <label className="block text-xs font-medium text-slate-700 uppercase">
                       Faculty Mentor (Strict Capacity Limit)
                     </label>
                     <select
                       value={mentorId}
                       onChange={(e) => setMentorId(e.target.value)}
-                      className="w-full p-3 text-xs font-bold rounded-xl border-2 border-slate-300 bg-white text-slate-900 cursor-pointer focus:border-[#f37021]"
+                      className="w-full p-2.5 text-xs font-normal rounded-xl border border-slate-200 bg-white text-slate-800 cursor-pointer focus:border-[#f37021] focus:ring-1 focus:ring-[#f37021]"
                     >
                       <option value="">Choose your mentor...</option>
                       {mentors.map((m) => {
@@ -334,13 +334,13 @@ export const Profile: React.FC = () => {
 
                   {/* Class Advisor */}
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-black text-slate-900 uppercase">
+                    <label className="block text-xs font-medium text-slate-700 uppercase">
                       Class Advisor
                     </label>
                     <select
                       value={advisorId}
                       onChange={(e) => setAdvisorId(e.target.value)}
-                      className="w-full p-3 text-xs font-bold rounded-xl border-2 border-slate-300 bg-white text-slate-900 cursor-pointer focus:border-[#f37021]"
+                      className="w-full p-2.5 text-xs font-normal rounded-xl border border-slate-200 bg-white text-slate-800 cursor-pointer focus:border-[#f37021] focus:ring-1 focus:ring-[#f37021]"
                     >
                       <option value="">Choose Class Advisor...</option>
                       {advisors.map((a) => (
@@ -358,7 +358,7 @@ export const Profile: React.FC = () => {
               <button
                 type="submit"
                 disabled={saving}
-                className="flex items-center gap-2 px-6 py-3 text-xs font-black text-white bg-gradient-to-r from-[#f37021] to-[#d8580d] hover:from-[#ff8133] hover:to-[#e06214] rounded-xl shadow-md transition-all duration-200 cursor-pointer disabled:opacity-50"
+                className="flex items-center gap-2 px-6 py-2.5 text-xs font-medium text-white bg-gradient-to-r from-[#f37021] to-[#d8580d] hover:from-[#ff8133] hover:to-[#e06214] rounded-xl shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>{saving ? 'Saving Changes...' : 'Save Profile Changes'}</span>
